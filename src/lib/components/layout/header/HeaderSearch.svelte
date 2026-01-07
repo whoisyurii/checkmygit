@@ -10,6 +10,11 @@
 	let searchValue = $state(username);
 	let searchFocused = $state(false);
 
+	// Update searchValue when username changes (e.g. navigation)
+	$effect(() => {
+		searchValue = username;
+	});
+
 	function handleSearch(e: KeyboardEvent) {
 		if (e.key === 'Enter' && searchValue.trim()) {
 			goto(`/${searchValue.trim()}`);
