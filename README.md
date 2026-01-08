@@ -1,42 +1,63 @@
-# CheckMyGit
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
 
-## Creating a project
+<h1 align="center">CheckMyGit</h1>
 
-If you're seeing this, you've probably already done this step. Congrats!
+<p align="center">
+  <strong>Transform any GitHub profile into a stunning portfolio in seconds.</strong>
+</p>
 
-```sh
-# create a new project in the current directory
-npx sv create
+<p align="center">
+  <a href="https://checkmygit.com">Live Demo</a> •
+  <a href="#features">Features</a> •
+  <a href="#tech-stack">Tech Stack</a> •
+  <a href="#roadmap">Roadmap</a>
+</p>
 
-# create a new project in my-app
-npx sv create my-app
-```
+---
 
-## Developing
+<p align="center">
+  <img src="src/lib/assets/readme_img.png" alt="CheckMyGit" width="100%" />
+</p>
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+---
 
-```sh
-npm run dev
+## Features
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+- **Instant Generation** — Enter any GitHub username, get a beautiful portfolio
+- **3 Templates** — GitHub-style sidebar, Bento grid, or Minimal CV layout
+- **Contribution Graph** — Full year heatmap visualization
+- **Language Stats** — Donut chart breakdown of your tech stack
+- **Pinned Projects** — Showcase your best repositories
+- **PNG Export** — Download your portfolio as an image
+- **Shareable URLs** — `checkmygit.com/username?template=bento`
+- **No Auth Required** — Fully open source, no sign-up needed
 
-## Building
+## Tech Stack
 
-To create a production version of your app:
+- **Framework:** SvelteKit 2 + Svelte 5 Runes
+- **Styling:** Tailwind CSS 4
+- **API:** GitHub GraphQL + REST fallback
+- **Deployment:** Cloudflare Pages
+- **Export:** html-to-image
 
-```sh
-npm run build
-```
+## Roadmap
 
-You can preview the production build with `npm run preview`.
+- [ ] **Dynamic OG Images** — Satori + Resvg for custom social preview cards
+- [ ] **New Templates** — Developer card, Resume/CV, Portfolio grid
+- [ ] **UI Polish** — Dark/light theme toggle, animation refinements
+- [ ] **PDF Export** — Download portfolio as PDF document
+- [ ] **Custom Themes** — User-defined accent colors and fonts
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+## Contributing
+
+Contributions welcome! Feel free to open issues or submit PRs.
 
 ## License
 
-This project is licensed under a modified MIT License. See the [LICENSE](LICENSE) file for details. Note that commercial selling of this software without significant modification is prohibited.
+MIT
+
+---
+
+<p align="center">
+  Built with SvelteKit & shipped on Cloudflare
+</p>
