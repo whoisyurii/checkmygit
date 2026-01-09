@@ -48,10 +48,10 @@
 			</div>
 		{/if}
 
-		<h1 class="mb-6 text-5xl font-abril tracking-tight md:text-7xl">
+		<h1 class="mb-6 text-5xl font-bold tracking-tight md:text-7xl">
 			Transform your GitHub
 			<br />
-			<span class="text-gradient font-abril">into a portfolio</span>
+			<span class="text-gradient">into a portfolio</span>
 		</h1>
 
 		<p class="mx-auto mb-10 w-full max-w-150 text-lg text-text-secondary md:text-xl">

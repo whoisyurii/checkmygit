@@ -6,10 +6,6 @@ class NavigationState {
 	targetUsername = $state<string | null>(null);
 	phase = $state<'idle' | 'exiting' | 'loading' | 'entering'>('idle');
 
-	/**
-	 * Navigate to a profile with the loading animation.
-	 * This triggers the exit animation, then navigates after a delay.
-	 */
 	async navigateToProfile(username: string) {
 		if (this.isLoading) return;
 
@@ -26,10 +22,6 @@ class NavigationState {
 		await goto(`/${username.trim()}`);
 	}
 
-	/**
-	 * Called when profile page has loaded and is ready to show.
-	 * Triggers the enter animation.
-	 */
 	profileLoaded() {
 		if (this.phase === 'loading' || this.phase === 'exiting') {
 			this.phase = 'entering';
@@ -43,9 +35,7 @@ class NavigationState {
 		}
 	}
 
-	/**
-	 * Reset the navigation state (e.g., on error)
-	 */
+
 	reset() {
 		this.isLoading = false;
 		this.targetUsername = null;
