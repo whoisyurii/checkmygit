@@ -5,6 +5,7 @@
 	import Badge from '$lib/components/ui/Badge.svelte';
 	import ContributionGraph from '$lib/components/portfolio/ContributionGraph.svelte';
 	import ProjectCard from '$lib/components/portfolio/ProjectCard.svelte';
+	import Dropdown from '$lib/components/ui/Dropdown.svelte';
 
 	interface Props {
 		profile: GitHubProfile;
@@ -21,6 +22,18 @@
 	// Top 3 languages for the chart
 	const topLanguages = $derived(profile.languages.slice(0, 3));
 	const langTotal = $derived(topLanguages.reduce((sum, l) => sum + l.size, 0));
+
+	let sortBy = $state('stars');
+	const sortOptions = [
+		{ value: 'stars', label: 'Most Stars' },
+		{ value: 'pinned', label: 'Pinned Order' }
+	];
+
+	const sortedRepos = $derived(
+		sortBy === 'stars'
+			? [...profile.pinnedRepositories].sort((a, b) => b.stargazerCount - a.stargazerCount)
+			: profile.pinnedRepositories
+	);
 </script>
 
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 {className}">
@@ -212,14 +225,17 @@
 		<!-- Projects (full width) -->
 		{#if profile.pinnedRepositories.length > 0}
 			<div class="md:col-span-2 lg:col-span-4">
-				<h3 class="mb-4 flex items-center gap-2 text-lg font-semibold text-[var(--color-text-primary)]">
-					<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-					</svg>
-					Pinned Projects
-				</h3>
+				<div class="mb-4 flex items-center justify-between">
+					<h3 class="flex items-center gap-2 text-lg font-semibold text-[var(--color-text-primary)]">
+						<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+						</svg>
+						Pinned Projects
+					</h3>
+					<Dropdown options={sortOptions} bind:value={sortBy} />
+				</div>
 				<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-					{#each profile.pinnedRepositories.slice(0, 6) as repo}
+					{#each sortedRepos.slice(0, 6) as repo}
 						<ProjectCard {repo} />
 					{/each}
 				</div>

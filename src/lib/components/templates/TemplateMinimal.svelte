@@ -2,6 +2,7 @@
 	import type { GitHubProfile } from '$lib/types/github';
 	import { formatNumber, formatJoinDate, getTotalContributions } from '$lib/utils/github-transform';
 	import Badge from '$lib/components/ui/Badge.svelte';
+	import Dropdown from '$lib/components/ui/Dropdown.svelte';
 
 	interface Props {
 		profile: GitHubProfile;
@@ -13,6 +14,18 @@
 
 	const totalContributions = $derived(getTotalContributions(profile));
 	const joinDate = $derived(formatJoinDate(profile.user.createdAt));
+
+	let sortBy = $state('stars');
+	const sortOptions = [
+		{ value: 'stars', label: 'Most Stars' },
+		{ value: 'pinned', label: 'Pinned Order' }
+	];
+
+	const sortedRepos = $derived(
+		sortBy === 'stars'
+			? [...profile.pinnedRepositories].sort((a, b) => b.stargazerCount - a.stargazerCount)
+			: profile.pinnedRepositories
+	);
 </script>
 
 <div class="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8 {className}">
@@ -111,11 +124,14 @@
 	<!-- Featured Projects -->
 	{#if profile.pinnedRepositories.length > 0}
 		<section class="mb-16">
-			<h2 class="mb-8 text-center text-xs font-semibold uppercase tracking-widest text-text-tertiary">
-				Featured Projects
-			</h2>
+			<div class="mb-8 flex items-center justify-between">
+				<h2 class="text-xs font-semibold uppercase tracking-widest text-text-tertiary">
+					Featured Projects
+				</h2>
+				<Dropdown options={sortOptions} bind:value={sortBy} />
+			</div>
 			<div class="space-y-6">
-				{#each profile.pinnedRepositories.slice(0, 4) as repo}
+				{#each sortedRepos.slice(0, 4) as repo}
 					<a
 						href={repo.url}
 						target="_blank"
