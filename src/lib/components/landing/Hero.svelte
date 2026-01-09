@@ -37,7 +37,7 @@
 	}
 </script>
 
-<section class="relative z-10 flex flex-col items-center justify-center px-6 pb-20 pt-32 text-center md:pb-32 md:pt-40">
+<section class="relative z-10 flex flex-col items-center justify-center px-6 pb-20 pt-16 text-center md:pb-32 md:pt-40">
 	<div class="animate-fade-in relative z-10 max-w-4xl">
 		<!-- Badge -->
 		{#if totalPortfolios > 0}
@@ -48,13 +48,13 @@
 			</div>
 		{/if}
 
-		<h1 class="mb-6 text-5xl font-bold tracking-tight md:text-7xl">
+		<h1 class="mb-6 text-4xl font-bold tracking-tight md:text-7xl">
 			Transform your GitHub
 			<br />
 			<span class="text-gradient">into a portfolio</span>
 		</h1>
 
-		<p class="mx-auto mb-10 w-full max-w-150 text-lg text-text-secondary md:text-xl">
+		<p class="mx-auto mb-10 w-full max-w-150 text-base text-text-secondary md:text-xl">
 			Generate beautiful, shareable portfolio pages from any GitHub profile. Showcase your contributions, projects, and skills in seconds.
 		</p>
 
