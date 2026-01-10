@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import Header from '$lib/components/layout/Header.svelte';
 	import Footer from '$lib/components/layout/Footer.svelte';
 	import TemplateGitHub from '$lib/components/templates/TemplateGitHub.svelte';
 	import TemplateBento from '$lib/components/templates/TemplateBento.svelte';
 	import TemplateMinimal from '$lib/components/templates/TemplateMinimal.svelte';
+	import ExportContainer from '$lib/components/export/ExportContainer.svelte';
 	import { generatorState, toastState } from '$lib/stores/generator.svelte';
 	import { navigationState } from '$lib/stores/navigation.svelte';
 	import { generateShareUrl } from '$lib/utils/github-transform';
@@ -42,16 +43,19 @@
 
 	// Handle export
 	async function handleExport() {
-		generatorState.isExporting = true;
+		generatorState.enterExportMode();
+
+		// Wait for export container to render
+		await tick();
+
 		try {
-			// Dynamic import for html-to-image
 			const { toPng } = await import('html-to-image');
-			const element = document.getElementById('portfolio-container');
-			if (!element) throw new Error('Portfolio container not found');
+			const element = document.getElementById('export-container');
+			if (!element) throw new Error('Export container not found');
 
 			const dataUrl = await toPng(element, {
-				backgroundColor: '#0d1117',
-				pixelRatio: 2
+				pixelRatio: 2,
+				cacheBust: true
 			});
 
 			// Download
@@ -65,7 +69,7 @@
 			console.error('Export failed:', err);
 			toastState.error('Failed to export portfolio');
 		} finally {
-			generatorState.isExporting = false;
+			generatorState.exitExportMode();
 		}
 	}
 
@@ -118,3 +122,18 @@
 
 	<Footer />
 </div>
+
+<!-- Export Container (rendered off-screen when exporting) -->
+{#if generatorState.isExportMode}
+	<div class="fixed -left-[9999px] top-0">
+		<ExportContainer>
+			{#if generatorState.template === 'github'}
+				<TemplateGitHub profile={data.profile} views={data.views} />
+			{:else if generatorState.template === 'bento'}
+				<TemplateBento profile={data.profile} views={data.views} />
+			{:else if generatorState.template === 'minimal'}
+				<TemplateMinimal profile={data.profile} views={data.views} />
+			{/if}
+		</ExportContainer>
+	</div>
+{/if}

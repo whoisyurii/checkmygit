@@ -1,5 +1,6 @@
 import type { TemplateType, ThemeType, PortfolioOptions, ExportFormat } from '$lib/types/portfolio';
 import type { GitHubProfile } from '$lib/types/github';
+import { SvelteURLSearchParams } from 'svelte/reactivity';
 
 // Generator state class using Svelte 5 runes
 class GeneratorState {
@@ -20,6 +21,7 @@ class GeneratorState {
 
 	// Export state
 	isExporting = $state(false);
+	isExportMode = $state(false);
 	exportFormat = $state<ExportFormat>('png');
 
 	// Share state
@@ -70,6 +72,16 @@ class GeneratorState {
 		this.exportFormat = format;
 	}
 
+	enterExportMode() {
+		this.isExportMode = true;
+		this.isExporting = true;
+	}
+
+	exitExportMode() {
+		this.isExportMode = false;
+		this.isExporting = false;
+	}
+
 	reset() {
 		this.template = 'github';
 		this.theme = 'dark';
@@ -95,7 +107,7 @@ class GeneratorState {
 
 	// Generate URL params from current options
 	toParams(): URLSearchParams {
-		const params = new URLSearchParams();
+		const params = new SvelteURLSearchParams();
 		if (this.template !== 'github') params.set('template', this.template);
 		if (this.theme !== 'dark') params.set('theme', this.theme);
 		return params;
