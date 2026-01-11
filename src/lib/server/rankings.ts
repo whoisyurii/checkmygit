@@ -30,8 +30,13 @@ query TopRepositories($query: String!, $first: Int!) {
 }
 `;
 
-// GraphQL query for top users (includes star count from top 10 repos for performance)
-const TOP_USERS_QUERY = `
+// GraphQL query for top users - generates query with optional isFork filter
+function getTopUsersQuery(excludeForks: boolean): string {
+	const repoFilter = excludeForks
+		? 'repositories(privacy: PUBLIC, isFork: false, first: 10, orderBy: {field: STARGAZERS, direction: DESC})'
+		: 'repositories(privacy: PUBLIC, first: 10, orderBy: {field: STARGAZERS, direction: DESC})';
+
+	return `
 query TopUsers($query: String!, $first: Int!) {
   search(query: $query, type: USER, first: $first) {
     userCount
@@ -42,7 +47,7 @@ query TopUsers($query: String!, $first: Int!) {
         avatarUrl
         bio
         followers { totalCount }
-        repositories(privacy: PUBLIC, first: 10, orderBy: {field: STARGAZERS, direction: DESC}) {
+        ${repoFilter} {
           totalCount
           nodes { stargazerCount }
         }
@@ -51,6 +56,7 @@ query TopUsers($query: String!, $first: Int!) {
   }
 }
 `;
+}
 
 interface RankingsResult<T> {
 	success: boolean;
@@ -61,7 +67,8 @@ interface RankingsResult<T> {
 // Fetch top repositories from GitHub
 export async function fetchTopRepositories(
 	language?: string,
-	limit: number = 25
+	limit: number = 25,
+	excludeForks: boolean = true
 ): Promise<RankingsResult<RankedRepository>> {
 	if (!GITHUB_TOKEN) {
 		return {
@@ -73,9 +80,10 @@ export async function fetchTopRepositories(
 
 	try {
 		// Build search query
-		let searchQuery = 'stars:>1000 sort:stars';
+		const forkFilter = excludeForks ? ' fork:false' : '';
+		let searchQuery = `stars:>1000${forkFilter} sort:stars`;
 		if (language) {
-			searchQuery = `stars:>1000 language:${language} sort:stars`;
+			searchQuery = `stars:>1000 language:${language}${forkFilter} sort:stars`;
 		}
 
 		const response = await fetch(GITHUB_GRAPHQL_URL, {
@@ -138,7 +146,8 @@ export async function fetchTopRepositories(
 // Fetch top users from GitHub
 export async function fetchTopUsers(
 	sortBy: 'followers' | 'stars' = 'followers',
-	limit: number = 25
+	limit: number = 25,
+	excludeForks: boolean = true
 ): Promise<RankingsResult<RankedUser>> {
 	if (!GITHUB_TOKEN) {
 		return {
@@ -159,7 +168,7 @@ export async function fetchTopUsers(
 				'User-Agent': 'CheckMyGit'
 			},
 			body: JSON.stringify({
-				query: TOP_USERS_QUERY,
+				query: getTopUsersQuery(excludeForks),
 				variables: { query: searchQuery, first: limit }
 			})
 		});

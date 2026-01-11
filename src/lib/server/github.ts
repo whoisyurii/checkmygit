@@ -34,7 +34,7 @@ query GetUserProfile($username: String!) {
     following { totalCount }
     createdAt
     updatedAt
-    repositories(first: 100, orderBy: {field: STARGAZERS, direction: DESC}, privacy: PUBLIC, isFork: false) {
+    repositories(first: 100, orderBy: {field: STARGAZERS, direction: DESC}, privacy: PUBLIC) {
       totalCount
       nodes {
         name
@@ -298,10 +298,13 @@ function transformGraphQLResponse(data: GraphQLUserResponse): GitHubProfile {
 		contributionCalendar: user.contributionsCollection.contributionCalendar
 	};
 
-	const languages = calculateLanguageStats(repositories);
+	// Filter out forks for language stats (only count original work)
+	const originalRepos = repositories.filter((repo) => !repo.isFork);
+	const languages = calculateLanguageStats(originalRepos);
 	const yearsActive = calculateYearsActive(user.createdAt);
 
 	const totalStars = repositories.reduce((sum, repo) => sum + repo.stargazerCount, 0);
+	const originalStars = originalRepos.reduce((sum, repo) => sum + repo.stargazerCount, 0);
 	const totalForks = repositories.reduce((sum, repo) => sum + repo.forkCount, 0);
 
 	return {
@@ -321,12 +324,13 @@ function transformGraphQLResponse(data: GraphQLUserResponse): GitHubProfile {
 			updatedAt: user.updatedAt
 		},
 		repositories,
-		pinnedRepositories: pinnedRepositories.length > 0 ? pinnedRepositories : repositories.slice(0, 6),
+		pinnedRepositories: pinnedRepositories.length > 0 ? pinnedRepositories : originalRepos.slice(0, 6),
 		contributions,
 		languages,
 		stats: {
 			totalRepos: user.repositories.totalCount,
 			totalStars,
+			originalStars,
 			totalForks,
 			followers: user.followers.totalCount,
 			following: user.following.totalCount,
@@ -337,8 +341,9 @@ function transformGraphQLResponse(data: GraphQLUserResponse): GitHubProfile {
 
 // Transform REST response to normalized profile
 function transformRESTResponse(userData: RESTUserResponse, reposData: RESTRepoResponse[]): GitHubProfile {
+	// Include all public repos (both original and forks)
 	const repositories: GitHubRepository[] = reposData
-		.filter((repo) => !repo.private && !repo.fork)
+		.filter((repo) => !repo.private)
 		.map((repo) => ({
 			name: repo.name,
 			description: repo.description,
@@ -357,10 +362,13 @@ function transformRESTResponse(userData: RESTUserResponse, reposData: RESTRepoRe
 			createdAt: repo.created_at
 		}));
 
-	const languages = calculateLanguageStats(repositories);
+	// Filter out forks for language stats
+	const originalRepos = repositories.filter((repo) => !repo.isFork);
+	const languages = calculateLanguageStats(originalRepos);
 	const yearsActive = calculateYearsActive(userData.created_at);
 
 	const totalStars = repositories.reduce((sum, repo) => sum + repo.stargazerCount, 0);
+	const originalStars = originalRepos.reduce((sum, repo) => sum + repo.stargazerCount, 0);
 	const totalForks = repositories.reduce((sum, repo) => sum + repo.forkCount, 0);
 
 	return {
@@ -380,12 +388,13 @@ function transformRESTResponse(userData: RESTUserResponse, reposData: RESTRepoRe
 			updatedAt: userData.updated_at
 		},
 		repositories,
-		pinnedRepositories: repositories.slice(0, 6), // REST API doesn't have pinned items
+		pinnedRepositories: originalRepos.slice(0, 6), // REST API doesn't have pinned items
 		contributions: null, // REST API doesn't have contribution data
 		languages,
 		stats: {
 			totalRepos: userData.public_repos,
 			totalStars,
+			originalStars,
 			totalForks,
 			followers: userData.followers,
 			following: userData.following,

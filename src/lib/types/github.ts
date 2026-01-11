@@ -75,6 +75,7 @@ export interface GitHubProfile {
 	stats: {
 		totalRepos: number;
 		totalStars: number;
+		originalStars: number; // Stars from non-fork repos only
 		totalForks: number;
 		followers: number;
 		following: number;

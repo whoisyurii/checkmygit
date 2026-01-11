@@ -9,14 +9,16 @@
 	import UsersTableSkeleton from '$lib/components/rankings/UsersTableSkeleton.svelte';
 	import LanguageFilter from '$lib/components/rankings/LanguageFilter.svelte';
 	import UserSortFilter from '$lib/components/rankings/UserSortFilter.svelte';
+	import RepoTypeFilter from '$lib/components/ui/RepoTypeFilter.svelte';
 	import Card from '$lib/components/ui/Card.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import type { RankedUser, RankedRepository } from '$lib/types/rankings';
 
 	let { data } = $props();
 
-	// Derive active tab from URL for reactivity
+	// Derive active tab and repoType from URL for reactivity
 	let activeTab = $derived($page.url.searchParams.get('tab') || 'repos');
+	let repoType = $derived(($page.url.searchParams.get('repoType') as 'all' | 'original') || 'original');
 
 	// Client-side user sort state
 	let userSortBy = $state<'followers' | 'stars'>('followers');
@@ -83,12 +85,19 @@
 		goto(url.toString(), { replaceState: true });
 	}
 
+	function changeRepoType(value: 'all' | 'original') {
+		const url = new URL($page.url);
+		url.searchParams.set('repoType', value);
+		goto(url.toString(), { replaceState: true });
+	}
+
 	async function loadMore() {
 		loadingMore = true;
 		try {
 			const url = new URL('/api/rankings', window.location.origin);
 			url.searchParams.set('type', activeTab);
 			url.searchParams.set('limit', '25');
+			url.searchParams.set('repoType', repoType);
 			if (activeTab === 'repos' && data.language) {
 				url.searchParams.set('language', data.language);
 			}
@@ -180,12 +189,14 @@
 
 		<!-- Filters -->
 		{#if activeTab === 'repos'}
-			<div class="mb-6 flex justify-center">
+			<div class="mb-6 flex flex-wrap items-center justify-center gap-4">
 				<LanguageFilter language={data.language} />
+				<RepoTypeFilter value={repoType} onchange={changeRepoType} />
 			</div>
 		{:else}
-			<div class="mb-6 flex justify-center">
+			<div class="mb-6 flex flex-wrap items-center justify-center gap-4">
 				<UserSortFilter sortBy={userSortBy} onchange={(v) => (userSortBy = v)} />
+				<RepoTypeFilter value={repoType} onchange={changeRepoType} />
 			</div>
 		{/if}
 

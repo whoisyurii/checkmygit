@@ -2,7 +2,8 @@ import {
 	DEFAULT_KV_RETRY_OPTIONS,
 	DEV_PROFILE_VIEWS,
 	DEV_GLOBAL_VIEWS,
-	GLOBAL_VIEW_KEY
+	GLOBAL_VIEW_KEY,
+	FALLBACK_VIEW_COUNT
 } from './constants';
 import type { ViewCountResult, ProfileViewResult, CookieAccessor, KVRetryOptions } from './types';
 import { handleDeduplication } from './deduplication';
@@ -119,8 +120,8 @@ async function getViewCount(
 		}
 	}
 
-	// 4. Ultimate fallback
-	return { count: 0, isStale: false, source: 'fallback' };
+	// 4. Ultimate fallback - show 1 because current user IS viewing
+	return { count: FALLBACK_VIEW_COUNT, isStale: false, source: 'fallback' };
 }
 
 // write view counts to KV and update cache
@@ -224,10 +225,11 @@ export async function handleProfileView(options: {
 		};
 	} catch (error) {
 		// Ultimate safety net - if anything unexpected fails, return fallback
+		// Show 1 because current user IS viewing the page
 		console.error('handleProfileView failed:', error);
 		return {
-			views: 0,
-			globalViews: 0,
+			views: FALLBACK_VIEW_COUNT,
+			globalViews: FALLBACK_VIEW_COUNT,
 			isStale: false,
 			source: 'fallback'
 		};
@@ -235,7 +237,7 @@ export async function handleProfileView(options: {
 }
 
 // get global view count (for homepage)
-// This function is designed to NEVER throw - always returns a valid result
+// Uses caching to minimize KV reads
 export async function getGlobalViewCount(
 	platform: App.Platform | undefined
 ): Promise<ViewCountResult> {
@@ -248,15 +250,5 @@ export async function getGlobalViewCount(
 		};
 	}
 
-	try {
-		return await getViewCount(platform, GLOBAL_VIEW_KEY, buildGlobalCacheKey());
-	} catch (error) {
-		// Ultimate safety net
-		console.error('getGlobalViewCount failed:', error);
-		return {
-			count: 0,
-			isStale: false,
-			source: 'fallback'
-		};
-	}
+	return getViewCount(platform, GLOBAL_VIEW_KEY, buildGlobalCacheKey());
 }
