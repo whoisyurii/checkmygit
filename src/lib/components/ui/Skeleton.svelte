@@ -21,6 +21,28 @@
 </script>
 
 <div
-	class="animate-pulse bg-[var(--color-bg-tertiary)] {variantClasses[variant]} {className}"
+	class="skeleton-shimmer {variantClasses[variant]} {className}"
 	style="{width ? `width: ${width};` : ''} {height ? `height: ${height};` : ''}"
 ></div>
+
+<style>
+	.skeleton-shimmer {
+		background: linear-gradient(
+			90deg,
+			var(--color-bg-tertiary) 0%,
+			var(--color-bg-secondary) 50%,
+			var(--color-bg-tertiary) 100%
+		);
+		background-size: 200% 100%;
+		animation: shimmer 1.5s ease-in-out infinite;
+	}
+
+	@keyframes shimmer {
+		0% {
+			background-position: 200% 0;
+		}
+		100% {
+			background-position: -200% 0;
+		}
+	}
+</style>

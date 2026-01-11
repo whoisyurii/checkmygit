@@ -1,11 +1,16 @@
 <script lang="ts">
+	import { replaceState } from '$app/navigation';
+	import { page } from '$app/stores';
 	import Header from '$lib/components/layout/Header.svelte';
 	import Footer from '$lib/components/layout/Footer.svelte';
 	import ReposTable from '$lib/components/rankings/ReposTable.svelte';
 	import UsersTable from '$lib/components/rankings/UsersTable.svelte';
+	import ReposTableSkeleton from '$lib/components/rankings/ReposTableSkeleton.svelte';
+	import UsersTableSkeleton from '$lib/components/rankings/UsersTableSkeleton.svelte';
 	import LanguageFilter from '$lib/components/rankings/LanguageFilter.svelte';
 	import UserSortFilter from '$lib/components/rankings/UserSortFilter.svelte';
 	import Card from '$lib/components/ui/Card.svelte';
+	import type { RankedUser } from '$lib/types/rankings';
 
 	let { data } = $props();
 
@@ -15,9 +20,25 @@
 	// Client-side user sort state
 	let userSortBy = $state<'followers' | 'stars'>('followers');
 
+	// Store resolved users for client-side sorting
+	let resolvedUsers = $state<RankedUser[]>([]);
+
+	// Track users loading state
+	let usersResult = $state<{ success: boolean; data: RankedUser[]; error?: string } | null>(null);
+
+	// Load users data via effect
+	$effect(() => {
+		data.streamed.users.then((result) => {
+			usersResult = result;
+			if (result.success) {
+				resolvedUsers = result.data;
+			}
+		});
+	});
+
 	// Sort users client-side based on selection
 	const sortedUsers = $derived.by(() => {
-		const users = [...data.users];
+		const users = [...resolvedUsers];
 		if (userSortBy === 'stars') {
 			users.sort((a, b) => b.totalStars - a.totalStars);
 		} else {
@@ -38,9 +59,9 @@
 	function switchTab(tabId: string) {
 		activeTab = tabId;
 		// Update URL without navigation for bookmarkability
-		const url = new URL(window.location.href);
+		const url = new URL($page.url);
 		url.searchParams.set('tab', tabId);
-		window.history.replaceState({}, '', url.toString());
+		replaceState(url, {});
 	}
 </script>
 
@@ -107,23 +128,40 @@
 
 		<!-- Content -->
 		<Card variant="default" padding="none">
-			{#if data.error}
-				<div class="p-8 text-center">
-					<svg class="mx-auto mb-4 h-12 w-12 text-[var(--color-accent-red)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-					</svg>
-					<p class="text-[var(--color-text-secondary)]">{data.error}</p>
-				</div>
-			{:else if activeTab === 'repos'}
-				{#if data.repos.length === 0}
+			{#if activeTab === 'repos'}
+				{#await data.streamed.repos}
+					<ReposTableSkeleton />
+				{:then result}
+					{#if !result.success}
+						<div class="p-8 text-center">
+							<svg class="mx-auto mb-4 h-12 w-12 text-[var(--color-accent-red)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+							</svg>
+							<p class="text-[var(--color-text-secondary)]">{result.error || 'Failed to load repositories'}</p>
+						</div>
+					{:else if result.data.length === 0}
+						<div class="p-8 text-center">
+							<p class="text-[var(--color-text-secondary)]">No repositories found.</p>
+						</div>
+					{:else}
+						<ReposTable repos={result.data} />
+					{/if}
+				{:catch}
 					<div class="p-8 text-center">
-						<p class="text-[var(--color-text-secondary)]">No repositories found.</p>
+						<p class="text-[var(--color-text-secondary)]">Failed to load repositories.</p>
 					</div>
-				{:else}
-					<ReposTable repos={data.repos} />
-				{/if}
+				{/await}
 			{:else}
-				{#if sortedUsers.length === 0}
+				{#if usersResult === null}
+					<UsersTableSkeleton />
+				{:else if !usersResult.success}
+					<div class="p-8 text-center">
+						<svg class="mx-auto mb-4 h-12 w-12 text-[var(--color-accent-red)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+						</svg>
+						<p class="text-[var(--color-text-secondary)]">{usersResult.error || 'Failed to load users'}</p>
+					</div>
+				{:else if sortedUsers.length === 0}
 					<div class="p-8 text-center">
 						<p class="text-[var(--color-text-secondary)]">No users found.</p>
 					</div>
