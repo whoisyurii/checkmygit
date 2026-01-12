@@ -22,7 +22,7 @@
 		md: 'px-2.5 py-1 text-xs'
 	};
 
-	const baseClasses = $derived(`inline-flex items-center rounded-full font-medium ${sizeClasses[size]}`);
+	const baseClasses = $derived(`inline-flex items-center rounded-full font-medium whitespace-nowrap ${sizeClasses[size]}`);
 
 	// Generate style if custom color is provided
 	const style = $derived(color

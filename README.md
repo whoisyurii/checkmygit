@@ -48,6 +48,35 @@
 - [ ] **PDF Export** — Download portfolio as PDF document
 - [ ] **Custom Themes** — User-defined accent colors and fonts
 
+## Getting Started
+
+1. **Clone the repo**
+   ```bash
+   git clone https://github.com/whoisyurii/checkmygit.git
+   cd checkmygit
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env
+   ```
+   Then add your GitHub token to `.env`:
+   ```
+   GITHUB_TOKEN=ghp_your_token_here
+   ```
+   > Create a token at [github.com/settings/tokens](https://github.com/settings/tokens) with `read:user` scope. Optional but recommended to avoid rate limits.
+
+4. **Start the dev server**
+   ```bash
+   npm run dev
+   ```
+   Open [localhost:5173](http://localhost:5173) in your browser.
+
 ## Contributing
 
 Contributions welcome! Feel free to open issues or submit PRs.

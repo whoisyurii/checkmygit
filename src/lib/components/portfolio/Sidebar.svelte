@@ -64,7 +64,7 @@
 	{#if tags.length > 0}
 		<div class="flex flex-wrap justify-center lg:justify-start gap-2">
 			{#each tags as tag}
-				<Badge variant="outline" size="sm">{tag}</Badge>
+				<span class="shrink-0"><Badge variant="outline" size="sm">{tag}</Badge></span>
 			{/each}
 		</div>
 	{/if}
