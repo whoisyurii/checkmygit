@@ -53,9 +53,18 @@
 			const element = document.getElementById('export-container');
 			if (!element) throw new Error('Export container not found');
 
+			// Wait for fonts to load
+			await document.fonts.ready;
+
 			const dataUrl = await toPng(element, {
 				pixelRatio: 2,
-				cacheBust: true
+				cacheBust: true,
+				skipFonts: true,
+				fontEmbedCSS: '',
+				filter: (node) => {
+					// Skip script tags and other problematic nodes
+					return !(node instanceof HTMLScriptElement);
+				}
 			});
 
 			// Download
