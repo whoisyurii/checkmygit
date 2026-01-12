@@ -1,22 +1,48 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { onMount, tick } from 'svelte';
 	import Header from '$lib/components/layout/Header.svelte';
 	import Footer from '$lib/components/layout/Footer.svelte';
 	import TemplateGitHub from '$lib/components/templates/TemplateGitHub.svelte';
 	import TemplateBento from '$lib/components/templates/TemplateBento.svelte';
 	import TemplateMinimal from '$lib/components/templates/TemplateMinimal.svelte';
+	import ProfileSkeletonGitHub from '$lib/components/portfolio/ProfileSkeletonGitHub.svelte';
 	import ExportContainer from '$lib/components/export/ExportContainer.svelte';
 	import { generatorState, toastState } from '$lib/stores/generator.svelte';
 	import { navigationState } from '$lib/stores/navigation.svelte';
 	import { generateShareUrl } from '$lib/utils/github-transform';
 	import type { TemplateType } from '$lib/types/portfolio';
+	import type { GitHubProfile } from '$lib/types/github';
 
 	let { data } = $props();
 
+	// Track loading state and resolved data
+	let isLoading = $state(true);
+	let loadError = $state<Error | null>(null);
+	let profile = $state<GitHubProfile | null>(null);
+	let views = $state<number>(0);
+
+	// Resolve the streamed promises
+	$effect(() => {
+		isLoading = true;
+		loadError = null;
+
+		Promise.all([data.profile, data.views])
+			.then(([resolvedProfile, resolvedViews]) => {
+				profile = resolvedProfile;
+				views = resolvedViews;
+				isLoading = false;
+			})
+			.catch((err) => {
+				loadError = err;
+				isLoading = false;
+			});
+	});
+
 	// Track if we came from a navigation (for enter animation)
-	let showEnterAnimation = $state(navigationState.phase === 'loading' || navigationState.phase === 'exiting');
+	let showEnterAnimation = $derived(navigationState.phase === 'entering');
 
 	// Signal that the profile has loaded - trigger enter animation
 	onMount(() => {
@@ -99,11 +125,13 @@
 </script>
 
 <svelte:head>
-	<title>{data.profile.user.name || data.username} - CheckMyGit</title>
-	<meta name="description" content="GitHub portfolio for {data.profile.user.name || data.username}. {data.profile.user.bio || 'View their projects and contributions.'}" />
-	<meta property="og:title" content="{data.profile.user.name || data.username} - CheckMyGit" />
-	<meta property="og:description" content="{data.profile.user.bio || `GitHub portfolio for ${data.username}`}" />
-	<meta property="og:image" content="{data.profile.user.avatarUrl}" />
+	<title>{profile?.user.name || data.username} - CheckMyGit</title>
+	<meta name="description" content="GitHub portfolio for {profile?.user.name || data.username}. {profile?.user.bio || 'View their projects and contributions.'}" />
+	<meta property="og:title" content="{profile?.user.name || data.username} - CheckMyGit" />
+	<meta property="og:description" content="{profile?.user.bio || `GitHub portfolio for ${data.username}`}" />
+	{#if profile?.user.avatarUrl}
+		<meta property="og:image" content="{profile.user.avatarUrl}" />
+	{/if}
 	<meta property="og:type" content="profile" />
 	<meta name="twitter:card" content="summary_large_image" />
 </svelte:head>
@@ -119,12 +147,27 @@
 	/>
 
 	<main id="portfolio-container" class="min-h-screen bg-bg-primary">
-		{#if generatorState.template === 'github'}
-			<TemplateGitHub profile={data.profile} views={data.views} />
-		{:else if generatorState.template === 'bento'}
-			<TemplateBento profile={data.profile} views={data.views} />
-		{:else if generatorState.template === 'minimal'}
-			<TemplateMinimal profile={data.profile} views={data.views} />
+		{#if isLoading}
+			<!-- Show skeleton while loading -->
+			<ProfileSkeletonGitHub />
+		{:else if loadError}
+			<!-- Error state -->
+			<div class="flex min-h-[60vh] items-center justify-center">
+				<div class="text-center">
+					<div class="mb-4 text-6xl">😕</div>
+					<h2 class="mb-2 text-xl font-semibold text-text-primary">Something went wrong</h2>
+					<p class="mb-4 text-text-secondary">{loadError.message || 'Failed to load profile'}</p>
+					<a href={resolve('/')} class="text-accent-green hover:underline">← Back to home</a>
+				</div>
+			</div>
+		{:else if profile}
+			{#if generatorState.template === 'github'}
+				<TemplateGitHub {profile} {views} />
+			{:else if generatorState.template === 'bento'}
+				<TemplateBento {profile} {views} />
+			{:else if generatorState.template === 'minimal'}
+				<TemplateMinimal {profile} {views} />
+			{/if}
 		{/if}
 	</main>
 
@@ -132,15 +175,15 @@
 </div>
 
 <!-- Export Container (rendered off-screen when exporting) -->
-{#if generatorState.isExportMode}
+{#if generatorState.isExportMode && profile}
 	<div class="fixed -left-[9999px] top-0">
 		<ExportContainer>
 			{#if generatorState.template === 'github'}
-				<TemplateGitHub profile={data.profile} views={data.views} />
+				<TemplateGitHub {profile} {views} />
 			{:else if generatorState.template === 'bento'}
-				<TemplateBento profile={data.profile} views={data.views} />
+				<TemplateBento {profile} {views} />
 			{:else if generatorState.template === 'minimal'}
-				<TemplateMinimal profile={data.profile} views={data.views} />
+				<TemplateMinimal {profile} {views} />
 			{/if}
 		</ExportContainer>
 	</div>

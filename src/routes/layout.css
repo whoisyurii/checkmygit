@@ -187,34 +187,41 @@ a {
 	z-index: 0;
 }
 
-/* Page Transition Animations */
+/* Page Transition Animations - Slow liquid swipe bottom-to-top */
 @keyframes pageExitUp {
-	from {
+	0% {
 		opacity: 1;
-		transform: translateY(0);
+		transform: translateY(0) scale(1);
 	}
-	to {
+	100% {
 		opacity: 0;
-		transform: translateY(-60px);
+		transform: translateY(-100vh) scale(0.95);
 	}
 }
 
 @keyframes pageEnterFromBottom {
-	from {
+	0% {
 		opacity: 0;
-		transform: translateY(60px);
+		transform: translateY(100vh) scale(0.95);
 	}
-	to {
+	100% {
 		opacity: 1;
-		transform: translateY(0);
+		transform: translateY(0) scale(1);
 	}
 }
 
 .page-exit {
-	animation: pageExitUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+	animation: pageExitUp 0.8s cubic-bezier(0.76, 0, 0.24, 1) forwards;
 	pointer-events: none;
+	overflow: hidden;
 }
 
 .page-enter {
-	animation: pageEnterFromBottom 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+	animation: pageEnterFromBottom 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Prevent scroll during page transitions */
+body:has(.page-exit),
+body:has(.page-enter) {
+	overflow: hidden;
 }

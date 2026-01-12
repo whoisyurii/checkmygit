@@ -4,7 +4,7 @@ import { goto } from '$app/navigation';
 class NavigationState {
 	isLoading = $state(false);
 	targetUsername = $state<string | null>(null);
-	phase = $state<'idle' | 'exiting' | 'loading' | 'entering'>('idle');
+	phase = $state<'idle' | 'exiting' | 'entering'>('idle');
 
 	async navigateToProfile(username: string) {
 		if (this.isLoading) return;
@@ -13,17 +13,26 @@ class NavigationState {
 		this.isLoading = true;
 		this.phase = 'exiting';
 
-		// Wait for exit animation to complete
-		await new Promise((resolve) => setTimeout(resolve, 500));
+		// Wait for exit animation to complete before navigating
+		await new Promise((resolve) => setTimeout(resolve, 700));
 
-		this.phase = 'loading';
-
-		// Navigate to the profile page
+		// Navigate to the profile page (skeleton will show while data loads)
 		await goto(`/${username.trim()}`);
+
+		// Set entering phase for the new page
+		this.phase = 'entering';
+
+		// Reset state after enter animation completes
+		setTimeout(() => {
+			this.phase = 'idle';
+			this.isLoading = false;
+			this.targetUsername = null;
+		}, 900);
 	}
 
 	profileLoaded() {
-		if (this.phase === 'loading' || this.phase === 'exiting') {
+		// No longer needed since skeleton handles loading state
+		if (this.phase === 'exiting') {
 			this.phase = 'entering';
 
 			// Reset after enter animation completes
@@ -31,10 +40,9 @@ class NavigationState {
 				this.phase = 'idle';
 				this.isLoading = false;
 				this.targetUsername = null;
-			}, 800);
+			}, 500);
 		}
 	}
-
 
 	reset() {
 		this.isLoading = false;
