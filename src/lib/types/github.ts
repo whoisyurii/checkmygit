@@ -50,12 +50,36 @@ export interface ContributionCalendar {
 	weeks: ContributionWeek[];
 }
 
+export interface RepositoryContribution {
+	repository: {
+		nameWithOwner: string;
+		owner: { login: string };
+		primaryLanguage: { name: string; color: string } | null;
+		stargazerCount?: number;
+	};
+	contributions: {
+		totalCount: number;
+	};
+}
+
+export interface ExternalContribution {
+	repoName: string;
+	owner: string;
+	prCount: number;
+	commitCount: number;
+	language: { name: string; color: string } | null;
+	stargazerCount: number;
+}
+
 export interface ContributionsCollection {
 	totalCommitContributions: number;
 	totalIssueContributions: number;
 	totalPullRequestContributions: number;
 	totalPullRequestReviewContributions: number;
 	contributionCalendar: ContributionCalendar;
+	externalContributions?: ExternalContribution[];
+	externalPRCount?: number;
+	externalCommitCount?: number;
 }
 
 export interface LanguageStats {
@@ -153,6 +177,27 @@ export interface GraphQLUserResponse {
 					}>;
 				}>;
 			};
+			pullRequestContributionsByRepository: Array<{
+				repository: {
+					nameWithOwner: string;
+					owner: { login: string };
+					primaryLanguage: { name: string; color: string } | null;
+					stargazerCount: number;
+				};
+				contributions: {
+					totalCount: number;
+				};
+			}>;
+			commitContributionsByRepository: Array<{
+				repository: {
+					nameWithOwner: string;
+					owner: { login: string };
+					primaryLanguage: { name: string; color: string } | null;
+				};
+				contributions: {
+					totalCount: number;
+				};
+			}>;
 		};
 	} | null;
 }

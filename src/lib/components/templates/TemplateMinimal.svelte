@@ -3,6 +3,7 @@
 	import { formatNumber, formatJoinDate, getTotalContributions } from '$lib/utils/github-transform';
 	import Badge from '$lib/components/ui/Badge.svelte';
 	import Dropdown from '$lib/components/ui/Dropdown.svelte';
+	import ExternalContributions from '$lib/components/portfolio/ExternalContributions.svelte';
 
 	interface Props {
 		profile: GitHubProfile;
@@ -118,6 +119,17 @@
 					</Badge>
 				{/each}
 			</div>
+		</section>
+	{/if}
+
+	<!-- External Open Source Contributions -->
+	{#if profile.contributions?.externalContributions && profile.contributions.externalContributions.length > 0}
+		<section class="mb-16">
+			<ExternalContributions
+				contributions={profile.contributions.externalContributions}
+				totalPRs={profile.contributions.externalPRCount ?? 0}
+				totalCommits={profile.contributions.externalCommitCount ?? 0}
+			/>
 		</section>
 	{/if}
 

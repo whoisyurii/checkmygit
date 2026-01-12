@@ -3,6 +3,7 @@
 	import Sidebar from '$lib/components/portfolio/Sidebar.svelte';
 	import StatsGrid from '$lib/components/portfolio/StatsGrid.svelte';
 	import ContributionGraph from '$lib/components/portfolio/ContributionGraph.svelte';
+	import ExternalContributions from '$lib/components/portfolio/ExternalContributions.svelte';
 	import LanguageChart from '$lib/components/portfolio/LanguageChart.svelte';
 	import ProjectCard from '$lib/components/portfolio/ProjectCard.svelte';
 	import TechStack from '$lib/components/portfolio/TechStack.svelte';
@@ -64,11 +65,28 @@
 				<ContributionGraph {profile} />
 			{/if}
 
-			<!-- About & Languages -->
-			<div class="grid gap-6 md:grid-cols-2">
-				<TechStack languages={profile.languages} bio={profile.user.bio} />
-				<LanguageChart languages={profile.languages} />
+			<!-- Tech Stack & Languages -->
+			<div>
+				<div class="mb-4 flex items-center gap-2">
+					<svg class="h-5 w-5 text-[var(--color-text-tertiary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+					</svg>
+					<h3 class="text-lg font-semibold text-[var(--color-text-primary)]">Tech Stack & Languages</h3>
+				</div>
+				<div class="grid gap-4 md:grid-cols-2">
+					<TechStack languages={profile.languages} bio={profile.user.bio} />
+					<LanguageChart languages={profile.languages} />
+				</div>
 			</div>
+
+			<!-- External Open Source Contributions -->
+			{#if profile.contributions?.externalContributions && profile.contributions.externalContributions.length > 0}
+				<ExternalContributions
+					contributions={profile.contributions.externalContributions}
+					totalPRs={profile.contributions.externalPRCount ?? 0}
+					totalCommits={profile.contributions.externalCommitCount ?? 0}
+				/>
+			{/if}
 
 			<!-- Notable Projects -->
 			{#if profile.pinnedRepositories.length > 0}

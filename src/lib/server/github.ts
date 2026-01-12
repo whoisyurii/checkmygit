@@ -6,6 +6,7 @@ import type {
 	GitHubRepository,
 	LanguageStats,
 	ContributionsCollection,
+	ExternalContribution,
 	GraphQLUserResponse,
 	RESTUserResponse,
 	RESTRepoResponse,
@@ -88,6 +89,27 @@ query GetUserProfile($username: String!) {
             contributionCount
             color
           }
+        }
+      }
+      pullRequestContributionsByRepository(maxRepositories: 100) {
+        repository {
+          nameWithOwner
+          owner { login }
+          primaryLanguage { name color }
+          stargazerCount
+        }
+        contributions {
+          totalCount
+        }
+      }
+      commitContributionsByRepository(maxRepositories: 100) {
+        repository {
+          nameWithOwner
+          owner { login }
+          primaryLanguage { name color }
+        }
+        contributions {
+          totalCount
         }
       }
     }
@@ -290,12 +312,67 @@ function transformGraphQLResponse(data: GraphQLUserResponse): GitHubProfile {
 		createdAt: repo.createdAt
 	}));
 
+	// Process external contributions (repos not owned by the user)
+	const userLogin = user.login.toLowerCase();
+	const externalContributionsMap = new Map<string, ExternalContribution>();
+
+	// Process PR contributions to external repos
+	for (const prContrib of user.contributionsCollection.pullRequestContributionsByRepository) {
+		const ownerLogin = prContrib.repository.owner.login.toLowerCase();
+		if (ownerLogin !== userLogin) {
+			const repoKey = prContrib.repository.nameWithOwner;
+			const existing = externalContributionsMap.get(repoKey);
+			if (existing) {
+				existing.prCount += prContrib.contributions.totalCount;
+			} else {
+				externalContributionsMap.set(repoKey, {
+					repoName: prContrib.repository.nameWithOwner,
+					owner: prContrib.repository.owner.login,
+					prCount: prContrib.contributions.totalCount,
+					commitCount: 0,
+					language: prContrib.repository.primaryLanguage,
+					stargazerCount: prContrib.repository.stargazerCount
+				});
+			}
+		}
+	}
+
+	// Process commit contributions to external repos
+	for (const commitContrib of user.contributionsCollection.commitContributionsByRepository) {
+		const ownerLogin = commitContrib.repository.owner.login.toLowerCase();
+		if (ownerLogin !== userLogin) {
+			const repoKey = commitContrib.repository.nameWithOwner;
+			const existing = externalContributionsMap.get(repoKey);
+			if (existing) {
+				existing.commitCount += commitContrib.contributions.totalCount;
+			} else {
+				externalContributionsMap.set(repoKey, {
+					repoName: commitContrib.repository.nameWithOwner,
+					owner: commitContrib.repository.owner.login,
+					prCount: 0,
+					commitCount: commitContrib.contributions.totalCount,
+					language: commitContrib.repository.primaryLanguage,
+					stargazerCount: 0
+				});
+			}
+		}
+	}
+
+	const externalContributions = Array.from(externalContributionsMap.values())
+		.sort((a, b) => (b.prCount + b.commitCount) - (a.prCount + a.commitCount));
+
+	const externalPRCount = externalContributions.reduce((sum, c) => sum + c.prCount, 0);
+	const externalCommitCount = externalContributions.reduce((sum, c) => sum + c.commitCount, 0);
+
 	const contributions: ContributionsCollection = {
 		totalCommitContributions: user.contributionsCollection.totalCommitContributions,
 		totalIssueContributions: user.contributionsCollection.totalIssueContributions,
 		totalPullRequestContributions: user.contributionsCollection.totalPullRequestContributions,
 		totalPullRequestReviewContributions: user.contributionsCollection.totalPullRequestReviewContributions,
-		contributionCalendar: user.contributionsCollection.contributionCalendar
+		contributionCalendar: user.contributionsCollection.contributionCalendar,
+		externalContributions,
+		externalPRCount,
+		externalCommitCount
 	};
 
 	// Filter out forks for language stats (only count original work)

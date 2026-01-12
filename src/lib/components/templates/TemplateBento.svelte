@@ -4,6 +4,7 @@
 	import Card from '$lib/components/ui/Card.svelte';
 	import Badge from '$lib/components/ui/Badge.svelte';
 	import ContributionGraph from '$lib/components/portfolio/ContributionGraph.svelte';
+	import ExternalContributions from '$lib/components/portfolio/ExternalContributions.svelte';
 	import ProjectCard from '$lib/components/portfolio/ProjectCard.svelte';
 	import Dropdown from '$lib/components/ui/Dropdown.svelte';
 
@@ -219,6 +220,17 @@
 		{#if profile.contributions}
 			<div class="md:col-span-2 lg:col-span-4">
 				<ContributionGraph {profile} />
+			</div>
+		{/if}
+
+		<!-- External Open Source Contributions (full width) -->
+		{#if profile.contributions?.externalContributions && profile.contributions.externalContributions.length > 0}
+			<div class="md:col-span-2 lg:col-span-4">
+				<ExternalContributions
+					contributions={profile.contributions.externalContributions}
+					totalPRs={profile.contributions.externalPRCount ?? 0}
+					totalCommits={profile.contributions.externalCommitCount ?? 0}
+				/>
 			</div>
 		{/if}
 
