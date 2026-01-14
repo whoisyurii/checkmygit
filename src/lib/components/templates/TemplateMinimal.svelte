@@ -45,7 +45,7 @@
 			@{profile.user.login}
 		</p>
 		{#if profile.user.bio}
-			<p class="mx-auto mt-4 max-w-xl text-text-secondary">
+			<p class="mt-4 text-text-secondary">
 				{profile.user.bio}
 			</p>
 		{/if}
