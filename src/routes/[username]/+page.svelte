@@ -10,10 +10,12 @@
 	import TemplateMinimal from '$lib/components/templates/TemplateMinimal.svelte';
 	import ProfileSkeletonGitHub from '$lib/components/portfolio/ProfileSkeletonGitHub.svelte';
 	import ExportContainer from '$lib/components/export/ExportContainer.svelte';
+	import QRModal from '$lib/components/ui/QRModal.svelte';
 	import { generatorState, toastState } from '$lib/stores/generator.svelte';
 	import { navigationState } from '$lib/stores/navigation.svelte';
 	import { themeState } from '$lib/stores/theme.svelte';
 	import { generateShareUrl } from '$lib/utils/github-transform';
+	import { generateQRCode } from '$lib/utils/qr';
 	import type { TemplateType } from '$lib/types/portfolio';
 	import type { GitHubProfile } from '$lib/types/github';
 
@@ -134,6 +136,40 @@
 			toastState.info(url);
 		}
 	}
+
+	// Handle QR code generation
+	async function handleQRCode() {
+		const url = generateShareUrl(data.username, {
+			template: generatorState.template,
+			theme: themeState.current
+		});
+
+		try {
+			const qrDataUrl = await generateQRCode(url);
+			generatorState.setQRDataUrl(qrDataUrl);
+			generatorState.openQRModal();
+		} catch (err) {
+			console.error('QR generation failed:', err);
+			toastState.error('Failed to generate QR code');
+		}
+	}
+
+	// Get current share URL for modal display
+	function getCurrentShareUrl(): string {
+		return generateShareUrl(data.username, {
+			template: generatorState.template,
+			theme: themeState.current
+		});
+	}
+
+	// Handle QR code download
+	function handleQRDownload() {
+		const link = document.createElement('a');
+		link.download = `${data.username}-qrcode.png`;
+		link.href = generatorState.qrDataUrl;
+		link.click();
+		toastState.success('QR code downloaded!');
+	}
 </script>
 
 <svelte:head>
@@ -156,6 +192,7 @@
 	onTemplateChange={handleTemplateChange}
 	onExport={handleExport}
 	onShare={handleShare}
+	onQRCode={handleQRCode}
 	/>
 
 	<main id="portfolio-container" class="min-h-screen bg-bg-primary">
@@ -199,4 +236,14 @@
 			{/if}
 		</ExportContainer>
 	</div>
+{/if}
+
+<!-- QR Code Modal -->
+{#if generatorState.isQRModalOpen}
+	<QRModal
+		qrDataUrl={generatorState.qrDataUrl}
+		url={getCurrentShareUrl()}
+		onClose={() => generatorState.closeQRModal()}
+		onDownload={handleQRDownload}
+	/>
 {/if}

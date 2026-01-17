@@ -16,7 +16,7 @@
 	const variantClasses = {
 		text: 'h-4 w-full rounded',
 		circular: 'rounded-full',
-		rectangular: 'rounded-[var(--radius-md)]'
+		rectangular: 'rounded-md'
 	};
 </script>
 

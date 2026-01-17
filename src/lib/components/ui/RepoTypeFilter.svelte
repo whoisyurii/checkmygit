@@ -16,7 +16,7 @@
 </script>
 
 <div class="flex items-center gap-2">
-	<span class="text-sm text-[var(--color-text-secondary)]">{label}</span>
+	<span class="text-sm text-text-secondary">{label}</span>
 	<Dropdown
 		{options}
 		{value}

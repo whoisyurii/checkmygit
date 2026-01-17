@@ -28,7 +28,7 @@
 {#if visible}
 	<div
 		class="
-			flex items-center gap-3 rounded-[var(--radius-md)] px-4 py-3 shadow-lg
+			flex items-center gap-3 rounded-md px-4 py-3 shadow-lg
 			{typeClasses[type]}
 		"
 		role="alert"

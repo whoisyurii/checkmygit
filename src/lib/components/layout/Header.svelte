@@ -12,6 +12,7 @@
 		onTemplateChange?: (template: TemplateType) => void;
 		onExport?: () => void;
 		onShare?: () => void;
+		onQRCode?: () => void;
 	}
 
 	let {
@@ -20,7 +21,8 @@
 		showControls = false,
 		onTemplateChange,
 		onExport,
-		onShare
+		onShare,
+		onQRCode
 	}: Props = $props();
 </script>
 
@@ -40,6 +42,6 @@
 			{/if}
 		</div>
 
-		<HeaderActions {showControls} {onExport} {onShare} />
+		<HeaderActions {showControls} {onExport} {onShare} {onQRCode} />
 	</div>
 </header>
