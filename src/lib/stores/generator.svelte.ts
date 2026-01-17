@@ -28,6 +28,10 @@ class GeneratorState {
 	shareUrl = $state('');
 	isSharing = $state(false);
 
+	// QR state
+	isQRModalOpen = $state(false);
+	qrDataUrl = $state('');
+
 	// Derived: full options object
 	options = $derived<PortfolioOptions>({
 		template: this.template,
@@ -80,6 +84,19 @@ class GeneratorState {
 	exitExportMode() {
 		this.isExportMode = false;
 		this.isExporting = false;
+	}
+
+	openQRModal() {
+		this.isQRModalOpen = true;
+	}
+
+	closeQRModal() {
+		this.isQRModalOpen = false;
+		this.qrDataUrl = '';
+	}
+
+	setQRDataUrl(url: string) {
+		this.qrDataUrl = url;
 	}
 
 	reset() {

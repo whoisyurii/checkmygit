@@ -19,13 +19,12 @@
 		onclick
 	}: Props = $props();
 
-	const baseClasses = 'rounded-[var(--radius-md)] transition-all';
+	const baseClasses = 'rounded-md transition-all';
 
 	const variantClasses = {
-		default: 'bg-[var(--color-bg-secondary)] border border-[var(--color-border-default)]',
-		elevated:
-			'bg-[var(--color-bg-secondary)] border border-[var(--color-border-default)] shadow-[var(--shadow-md)]',
-		outline: 'bg-transparent border border-[var(--color-border-default)]',
+		default: 'bg-bg-secondary border border-border-default',
+		elevated: 'bg-bg-secondary border border-border-default shadow-md',
+		outline: 'bg-transparent border border-border-default',
 		ghost: 'bg-transparent'
 	};
 
@@ -37,9 +36,7 @@
 	};
 
 	const hoverClasses = $derived(
-		hover
-			? 'cursor-pointer hover:border-[var(--color-border-subtle)] hover:bg-[var(--color-bg-tertiary)]'
-			: ''
+		hover ? 'cursor-pointer hover:border-border-subtle hover:bg-bg-tertiary' : ''
 	);
 
 	const classes = $derived(`${baseClasses} ${variantClasses[variant]} ${paddingClasses[padding]} ${hoverClasses} ${className}`);

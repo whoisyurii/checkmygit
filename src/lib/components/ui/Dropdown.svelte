@@ -60,17 +60,17 @@
 		<button
 			type="button"
 			class="
-				flex h-9 w-full items-center justify-between rounded-[var(--radius-md)]
-				border border-[var(--color-border-default)] bg-[var(--color-bg-secondary)]
-				px-3 text-sm text-[var(--color-text-primary)] transition-colors
-				hover:bg-[var(--color-bg-tertiary)]
-				focus:border-[var(--color-saas-green)] focus:outline-none focus:ring-1 focus:ring-[var(--color-saas-green)]
+				flex h-9 w-full items-center justify-between rounded-md
+				border border-border-default bg-bg-secondary
+				px-3 text-sm text-text-primary transition-colors
+				hover:bg-bg-tertiary
+				focus:border-accent-green focus:outline-none focus:ring-1 focus:ring-accent-green
 				disabled:cursor-not-allowed disabled:opacity-50
 			"
 			onclick={() => !disabled && (isOpen = !isOpen)}
 			{disabled}
 		>
-			<span class={!selectedOption ? 'text-[var(--color-text-placeholder)]' : ''}>
+			<span class={!selectedOption ? 'text-text-placeholder' : ''}>
 				{#if selectedOption}
 					<span class="sm:hidden">{selectedOption.mobileLabel || selectedOption.label}</span>
 					<span class="hidden sm:inline">{selectedOption.label}</span>
@@ -79,7 +79,7 @@
 				{/if}
 			</span>
 			<svg
-				class="h-4 w-4 text-[var(--color-text-tertiary)] transition-transform {isOpen
+				class="h-4 w-4 text-text-tertiary transition-transform {isOpen
 					? 'rotate-180'
 					: ''}"
 				fill="none"
@@ -100,12 +100,11 @@
 		></div>
 		<div
 			class="
-				absolute right-0 z-50 mt-1 min-w-[180px] overflow-hidden rounded-[var(--radius-md)]
-				border border-[var(--color-border-default)] bg-[var(--color-bg-secondary)]
-				shadow-[var(--shadow-lg)]
+				absolute right-0 z-50 mt-1 min-w-[180px] overflow-hidden rounded-md
+				border border-border-default bg-bg-secondary shadow-lg
 			"
 		>
-			{#each options as option}
+			{#each options as option (option.value)}
 				<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 				<div
 					role="option"
@@ -113,9 +112,9 @@
 					tabindex="0"
 					class="
 						flex cursor-pointer items-center gap-2 px-3 py-2 text-sm
-						text-[var(--color-text-primary)] transition-colors
-						hover:bg-[var(--color-bg-tertiary)]
-						{option.value === value ? 'bg-[var(--color-bg-tertiary)]' : ''}
+						text-text-primary transition-colors
+						hover:bg-bg-tertiary
+						{option.value === value ? 'bg-bg-tertiary' : ''}
 					"
 					onclick={() => selectOption(option)}
 					onkeydown={(e) => handleKeydown(e, option)}
@@ -125,7 +124,7 @@
 					{/if}
 					{option.label}
 					{#if option.value === value}
-						<svg class="ml-auto h-4 w-4 text-[var(--color-accent-green)]" fill="currentColor" viewBox="0 0 20 20">
+						<svg class="ml-auto h-4 w-4 text-accent-green" fill="currentColor" viewBox="0 0 20 20">
 							<path
 								fill-rule="evenodd"
 								d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"

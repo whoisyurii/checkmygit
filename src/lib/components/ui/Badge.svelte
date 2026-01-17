@@ -33,24 +33,15 @@
 </script>
 
 {#if variant === 'default'}
-	<span
-		class="{baseClasses} bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] {className}"
-		{style}
-	>
+	<span class="{baseClasses} bg-bg-tertiary text-text-secondary {className}" {style}>
 		{@render children()}
 	</span>
 {:else if variant === 'outline'}
-	<span
-		class="{baseClasses} border border-[var(--color-border-default)] text-[var(--color-text-secondary)] {className}"
-		{style}
-	>
+	<span class="{baseClasses} border border-border-default text-text-secondary {className}" {style}>
 		{@render children()}
 	</span>
 {:else}
-	<span
-		class="{baseClasses} bg-[var(--color-accent-green)] text-white {className}"
-		{style}
-	>
+	<span class="{baseClasses} bg-accent-green text-white {className}" {style}>
 		{@render children()}
 	</span>
 {/if}

@@ -32,19 +32,17 @@
 
 	const variantClasses = {
 		primary:
-			'bg-[var(--color-btn-primary-bg)] text-[var(--color-btn-primary-text)] hover:bg-[var(--color-btn-primary-hover)] focus-visible:ring-[var(--color-saas-green)]',
+			'bg-btn-primary-bg text-btn-primary-text hover:bg-btn-primary-hover focus-visible:ring-accent-green',
 		secondary:
-			'bg-[var(--color-btn-secondary-bg)] text-[var(--color-btn-secondary-text)] border border-[var(--color-border-default)] hover:bg-[var(--color-btn-secondary-hover)] hover:border-[var(--color-border-muted)] focus-visible:ring-[var(--color-saas-green)]',
-		ghost:
-			'text-[var(--color-text-primary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-tertiary)] focus-visible:ring-[var(--color-saas-green)]',
-		danger:
-			'bg-[var(--color-accent-red)] text-white hover:bg-red-600 focus-visible:ring-[var(--color-accent-red)]'
+			'bg-btn-secondary-bg text-btn-secondary-text border border-border-default hover:bg-btn-secondary-hover hover:border-border-muted focus-visible:ring-accent-green',
+		ghost: 'text-text-primary hover:text-text-primary hover:bg-bg-tertiary focus-visible:ring-accent-green',
+		danger: 'bg-accent-red text-white hover:bg-red-600 focus-visible:ring-accent-red'
 	};
 
 	const sizeClasses = {
-		sm: 'h-8 px-3 text-sm rounded-[var(--radius-md)] gap-1.5',
-		md: 'h-10 px-4 text-sm rounded-[var(--radius-md)] gap-2',
-		lg: 'h-12 px-5 text-base rounded-[var(--radius-lg)] gap-2'
+		sm: 'h-8 px-3 text-sm rounded-md gap-1.5',
+		md: 'h-10 px-4 text-sm rounded-md gap-2',
+		lg: 'h-12 px-5 text-base rounded-lg gap-2'
 	};
 
 	const classes = $derived(`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`);

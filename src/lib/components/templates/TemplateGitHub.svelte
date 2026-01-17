@@ -101,7 +101,7 @@
 						<Dropdown options={sortOptions} bind:value={sortBy} />
 					</div>
 					<div class="grid gap-4 sm:grid-cols-2">
-						{#each sortedRepos as repo}
+						{#each sortedRepos as repo (repo.name)}
 							<ProjectCard {repo} />
 						{/each}
 					</div>

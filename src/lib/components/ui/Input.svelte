@@ -47,7 +47,7 @@
 <div class="relative {className}">
 	{#if icon}
 		<div
-			class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[var(--color-text-tertiary)]"
+			class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-text-tertiary"
 		>
 			{@render icon()}
 		</div>
@@ -65,17 +65,17 @@
 		{onkeydown}
 		autofocus={autofocus}
 		class="
-			w-full rounded-[var(--radius-md)] border bg-[var(--color-bg-secondary)]
-			text-[var(--color-text-primary)] placeholder-[var(--color-text-placeholder)]
+			w-full rounded-md border bg-bg-secondary
+			text-text-primary placeholder-text-placeholder
 			transition-colors
-			focus:border-[var(--color-saas-green)] focus:outline-none focus:ring-1 focus:ring-[var(--color-saas-green)]
+			focus:border-accent-green focus:outline-none focus:ring-1 focus:ring-accent-green
 			disabled:cursor-not-allowed disabled:opacity-50
 			{sizeClasses[size]}
 			{icon ? 'pl-10' : ''}
-			{error ? 'border-[var(--color-accent-red)]' : 'border-[var(--color-border-default)]'}
+			{error ? 'border-accent-red' : 'border-border-default'}
 		"
 	/>
 	{#if error}
-		<p class="mt-1 text-xs text-[var(--color-accent-red)]">{error}</p>
+		<p class="mt-1 text-xs text-accent-red">{error}</p>
 	{/if}
 </div>

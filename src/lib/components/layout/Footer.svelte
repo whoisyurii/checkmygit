@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import favicon from '$lib/assets/favicon.svg';
 	import { REPO_URL, AUTHOR_GITHUB_URL, AUTHOR_LINKEDIN_URL } from '$lib/constants';
 
@@ -19,21 +20,21 @@
 			<!-- Links -->
 			<nav class="flex items-center gap-6">
 				<a
-					href="/about"
+					href={resolve('/about')}
 					class="text-sm text-text-secondary transition-colors hover:text-text-primary"
 				>
 					About
 				</a>
-				<a
+				<!-- <a
 					href={REPO_URL}
 					target="_blank"
 					rel="noopener noreferrer"
 					class="text-sm text-text-secondary transition-colors hover:text-text-primary"
 				>
 					GitHub
-				</a>
+				</a> -->
 				<a
-					href="/privacy"
+					href={resolve('/privacy')}
 					class="text-sm text-text-secondary transition-colors hover:text-text-primary"
 				>
 					Privacy

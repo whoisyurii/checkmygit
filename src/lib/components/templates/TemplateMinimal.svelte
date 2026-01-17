@@ -113,7 +113,7 @@
 				Technologies
 			</h2>
 			<div class="flex flex-wrap justify-center gap-2">
-				{#each profile.languages as lang}
+				{#each profile.languages as lang (lang.name)}
 					<Badge variant="outline" color={lang.color} size="md">
 						{lang.name}
 					</Badge>
@@ -143,7 +143,7 @@
 				<Dropdown options={sortOptions} bind:value={sortBy} />
 			</div>
 			<div class="space-y-6">
-				{#each sortedRepos.slice(0, 4) as repo}
+				{#each sortedRepos.slice(0, 4) as repo (repo.name)}
 					<a
 						href={repo.url}
 						target="_blank"
