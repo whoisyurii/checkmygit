@@ -34,7 +34,7 @@
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 {className}">
 	<div class="flex flex-col gap-8 lg:flex-row">
 		<!-- Sidebar -->
-		<div class="w-full lg:w-[296px] lg:flex-shrink-0">
+		<div class="w-full lg:sticky lg:top-24 lg:self-start lg:w-[296px] lg:flex-shrink-0">
 			<Sidebar {profile} {views} />
 		</div>
 
