@@ -45,6 +45,15 @@ query GetUserProfile($username: String!) {
         stargazerCount
         forkCount
         primaryLanguage { name color }
+        languages(first: 10) {
+          edges {
+            size
+            node {
+              name
+              color
+            }
+          }
+        }
         isPrivate
         isFork
         isArchived
@@ -65,6 +74,15 @@ query GetUserProfile($username: String!) {
           stargazerCount
           forkCount
           primaryLanguage { name color }
+          languages(first: 10) {
+            edges {
+              size
+              node {
+                name
+                color
+              }
+            }
+          }
           isPrivate
           isFork
           isArchived
@@ -288,6 +306,7 @@ function transformGraphQLResponse(data: GraphQLUserResponse): GitHubProfile {
 		stargazerCount: repo.stargazerCount,
 		forkCount: repo.forkCount,
 		primaryLanguage: repo.primaryLanguage,
+		languages: repo.languages,
 		isPrivate: repo.isPrivate,
 		isFork: repo.isFork,
 		isArchived: repo.isArchived,
@@ -304,6 +323,7 @@ function transformGraphQLResponse(data: GraphQLUserResponse): GitHubProfile {
 		stargazerCount: repo.stargazerCount,
 		forkCount: repo.forkCount,
 		primaryLanguage: repo.primaryLanguage,
+		languages: repo.languages,
 		isPrivate: repo.isPrivate,
 		isFork: repo.isFork,
 		isArchived: repo.isArchived,
@@ -480,35 +500,57 @@ function transformRESTResponse(userData: RESTUserResponse, reposData: RESTRepoRe
 	};
 }
 
-// Calculate language statistics from repositories
+// Calculate language statistics from repositories using byte counts
 function calculateLanguageStats(repositories: GitHubRepository[]): LanguageStats[] {
-	const languageCounts = new Map<string, { count: number; color: string }>();
+	const languageBytes = new Map<string, { bytes: number; color: string }>();
 
 	for (const repo of repositories) {
-		if (repo.primaryLanguage) {
-			const existing = languageCounts.get(repo.primaryLanguage.name);
+		// GraphQL path: use detailed byte counts
+		if (repo.languages?.edges) {
+			for (const edge of repo.languages.edges) {
+				const existing = languageBytes.get(edge.node.name);
+				if (existing) {
+					existing.bytes += edge.size;
+				} else {
+					languageBytes.set(edge.node.name, {
+						bytes: edge.size,
+						color: edge.node.color
+					});
+				}
+			}
+		} else if (repo.primaryLanguage) {
+			// REST fallback: use repo count (1 per repo)
+			const existing = languageBytes.get(repo.primaryLanguage.name);
 			if (existing) {
-				existing.count++;
+				existing.bytes += 1;
 			} else {
-				languageCounts.set(repo.primaryLanguage.name, {
-					count: 1,
+				languageBytes.set(repo.primaryLanguage.name, {
+					bytes: 1,
 					color: repo.primaryLanguage.color
 				});
 			}
 		}
 	}
 
-	const total = Array.from(languageCounts.values()).reduce((sum, lang) => sum + lang.count, 0);
+	const totalBytes = Array.from(languageBytes.values()).reduce((sum, lang) => sum + lang.bytes, 0);
 
-	const stats: LanguageStats[] = Array.from(languageCounts.entries())
+	if (totalBytes === 0) return [];
+
+	const stats: LanguageStats[] = Array.from(languageBytes.entries())
 		.map(([name, data]) => ({
 			name,
 			color: data.color,
-			percentage: Math.round((data.count / total) * 100),
-			size: data.count
+			percentage: Math.round((data.bytes / totalBytes) * 100),
+			size: data.bytes
 		}))
 		.sort((a, b) => b.size - a.size)
-		.slice(0, 10); // Top 10 languages
+		.slice(0, 10);
+
+	// Fix rounding to ensure 100%
+	const sum = stats.reduce((s, x) => s + x.percentage, 0);
+	if (stats.length > 0 && sum !== 100) {
+		stats[0].percentage += 100 - sum;
+	}
 
 	return stats;
 }

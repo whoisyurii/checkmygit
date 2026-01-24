@@ -13,6 +13,12 @@
 	const topLanguages = $derived(languages.slice(0, 5));
 	const total = $derived(topLanguages.reduce((sum, lang) => sum + lang.size, 0));
 
+	function formatBytes(bytes: number): string {
+		if (bytes >= 1_000_000) return `${(bytes / 1_000_000).toFixed(1)}MB`;
+		if (bytes >= 1_000) return `${(bytes / 1_000).toFixed(1)}KB`;
+		return `${bytes} bytes`;
+	}
+
 	// Calculate cumulative offsets for the donut chart
 	function calculateSegments(langs: LanguageStats[]) {
 		const segments: Array<{ lang: LanguageStats; offset: number; percentage: number }> = [];
@@ -91,7 +97,7 @@
 
 	{#if topLanguages.length > 0}
 		<div class="mt-4 text-xs text-text-tertiary">
-			Based on top {total} repos
+			Based on {formatBytes(total)} of code
 		</div>
 	{/if}
 </Card>
