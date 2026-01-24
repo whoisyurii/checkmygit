@@ -19,5 +19,9 @@
 				Star on GitHub
 			</Button>
 		</div>
+		<p class="mt-8 text-sm text-text-secondary">
+			Made with <span class="text-red-500">&#10084;</span> by
+			<a href="https://github.com/whoisyurii" target="_blank" class="hover:text-text-primary hover:underline">@whoisyurii</a>
+		</p>
 	</div>
 </section>
