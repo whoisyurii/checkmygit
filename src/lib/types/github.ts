@@ -33,6 +33,19 @@ export interface GitHubRepository {
 	topics: string[];
 	pushedAt: string | null;
 	createdAt: string;
+	languages?: RepositoryLanguages;
+}
+
+export interface RepositoryLanguageEdge {
+	size: number;
+	node: {
+		name: string;
+		color: string;
+	};
+}
+
+export interface RepositoryLanguages {
+	edges: RepositoryLanguageEdge[];
 }
 
 export interface ContributionDay {
@@ -133,6 +146,12 @@ export interface GraphQLUserResponse {
 				stargazerCount: number;
 				forkCount: number;
 				primaryLanguage: { name: string; color: string } | null;
+				languages: {
+					edges: Array<{
+						size: number;
+						node: { name: string; color: string };
+					}>;
+				};
 				isPrivate: boolean;
 				isFork: boolean;
 				isArchived: boolean;
@@ -152,6 +171,12 @@ export interface GraphQLUserResponse {
 				stargazerCount: number;
 				forkCount: number;
 				primaryLanguage: { name: string; color: string } | null;
+				languages: {
+					edges: Array<{
+						size: number;
+						node: { name: string; color: string };
+					}>;
+				};
 				isPrivate: boolean;
 				isFork: boolean;
 				isArchived: boolean;
