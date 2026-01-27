@@ -2,7 +2,7 @@ import type { PageServerLoad } from './$types';
 import { fetchGitHubProfile } from '$lib/server/github';
 import { handleProfileView } from '$lib/server/kv';
 
-export const load: PageServerLoad = async ({ params, platform, cookies }) => {
+export const load: PageServerLoad = async ({ params, platform, cookies, getClientAddress }) => {
 	const { username } = params;
 
 	// Return username immediately for optimistic UI
@@ -28,7 +28,8 @@ export const load: PageServerLoad = async ({ params, platform, cookies }) => {
 		cookies: {
 			get: (name) => cookies.get(name),
 			set: (name, value, opts) => cookies.set(name, value, opts)
-		}
+		},
+		ip: getClientAddress()
 	})
 		.then((result) => result.views)
 		.catch(() => 0);

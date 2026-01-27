@@ -6,7 +6,7 @@ import {
 	FALLBACK_VIEW_COUNT
 } from './constants';
 import type { ViewCountResult, ProfileViewResult, CookieAccessor, KVRetryOptions } from './types';
-import { handleDeduplication } from './deduplication';
+import { handleDeduplication, getIpHash } from './deduplication';
 import {
 	getCachedCount,
 	setCachedCount,
@@ -15,6 +15,8 @@ import {
 	isCacheExpired,
 	isCacheTooStale
 } from './cache';
+
+const IP_DEDUP_TTL = 3600; // 1 hour in seconds
 
 // check if an error is a rate limit (429) error
 function isRateLimitError(error: unknown): boolean {
@@ -165,8 +167,9 @@ export async function handleProfileView(options: {
 	platform: App.Platform | undefined;
 	username: string;
 	cookies: CookieAccessor;
+	ip: string;
 }): Promise<ProfileViewResult> {
-	const { platform, username, cookies } = options;
+	const { platform, username, cookies, ip } = options;
 
 	// Local dev: return mock data
 	if (!isKVAvailable(platform)) {
@@ -179,14 +182,41 @@ export async function handleProfileView(options: {
 	}
 
 	try {
-		// 1. Check deduplication cookie (wrapped in try-catch for safety)
+		// 1. Check deduplication (Cookie + IP Check, wrapped in try-catch for safety)
 		let shouldCount = true;
+
 		try {
+			// A. Check Cookie (Fastest check first)
 			const result = handleDeduplication(cookies, username);
 			shouldCount = result.shouldCount;
+
+			// B. Check IP Hash in KV (Secure check for Incognito/Scripts)
+			// Only check if cookie said "yes" and we have access to the DB
+			if (shouldCount && isKVAvailable(platform) && ip) {
+				const kv = platform!.env.PROFILE_VIEWS;
+				const ipHash = getIpHash(ip);
+				const dedupKey = `dedup:${ipHash}:${username.toLowerCase()}`;
+
+				// Check if this IP has viewed this profile recently
+				const hasViewedByIp = await kv.get(dedupKey);
+
+				if (hasViewedByIp) {
+					shouldCount = false;
+				} else {
+					// Mark this IP as "seen" for the next hour
+					// Use waitUntil so we don't slow down the page load
+					const writePromise = kv.put(dedupKey, '1', { expirationTtl: IP_DEDUP_TTL });
+
+					if (platform!.context) {
+						platform!.context.waitUntil(writePromise);
+					} else {
+						writePromise.catch((e: unknown) => console.error('Failed to log IP:', e));
+					}
+				}
+			}
 		} catch (err) {
 			console.error('Deduplication check failed:', err);
-			// On error, default to counting the view (safer for analytics)
+			// Fail open: If DB errors, we count the view rather than breaking the page
 		}
 
 		// 2. Get current view counts (with caching/fallback)
