@@ -181,6 +181,29 @@
 		</a>
 	</div>
 
+	<!-- Organizations -->
+	{#if profile.organizations && profile.organizations.length > 0}
+		<div class="space-y-2">
+			<h3 class="text-sm font-semibold text-text-secondary">Organizations</h3>
+			<div class="flex flex-wrap justify-center lg:justify-start gap-2">
+				{#each profile.organizations as org (org.login)}
+					<a
+						href={org.url}
+						target="_blank"
+						rel="noopener noreferrer"
+						title={org.name || org.login}
+					>
+						<img
+							src={org.avatarUrl}
+							alt={org.login}
+							class="h-8 w-8 rounded-md border border-border-default bg-bg-tertiary"
+						/>
+					</a>
+				{/each}
+			</div>
+		</div>
+	{/if}
+
 	<!-- Profile Views -->
 	<div class="flex items-center justify-center lg:justify-start gap-2 text-sm text-text-secondary">
 		<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

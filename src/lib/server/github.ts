@@ -4,12 +4,14 @@ import type {
 	GitHubProfile,
 	GitHubUser,
 	GitHubRepository,
+	GitHubOrganization,
 	LanguageStats,
 	ContributionsCollection,
 	ExternalContribution,
 	GraphQLUserResponse,
 	RESTUserResponse,
 	RESTRepoResponse,
+	RESTOrgResponse,
 	GitHubResult,
 	GitHubError
 } from '$lib/types/github';
@@ -33,6 +35,9 @@ query GetUserProfile($username: String!) {
     email
     followers { totalCount }
     following { totalCount }
+    organizations(first: 10) {
+      nodes { login name avatarUrl url description }
+    }
     createdAt
     updatedAt
     repositories(first: 100, orderBy: {field: STARGAZERS, direction: DESC}, privacy: PUBLIC) {
@@ -253,14 +258,15 @@ async function fetchUserREST(username: string): Promise<GitHubResult<GitHubProfi
 
 		const userData = (await userResponse.json()) as RESTUserResponse;
 
-		// Fetch repositories
-		const reposResponse = await fetch(
-			`${GITHUB_REST_URL}/users/${username}/repos?sort=stars&direction=desc&per_page=100`,
-			{ headers }
-		);
+		// Fetch repositories and organizations in parallel
+		const [reposResponse, orgsResponse] = await Promise.all([
+			fetch(`${GITHUB_REST_URL}/users/${username}/repos?sort=stars&direction=desc&per_page=100`, { headers }),
+			fetch(`${GITHUB_REST_URL}/users/${username}/orgs?per_page=10`, { headers })
+		]);
 		const reposData = reposResponse.ok ? ((await reposResponse.json()) as RESTRepoResponse[]) : [];
+		const orgsData = orgsResponse.ok ? ((await orgsResponse.json()) as RESTOrgResponse[]) : [];
 
-		const profile = transformRESTResponse(userData, reposData);
+		const profile = transformRESTResponse(userData, reposData, orgsData);
 		return { success: true, data: profile };
 	} catch (error) {
 		return {
@@ -404,6 +410,14 @@ function transformGraphQLResponse(data: GraphQLUserResponse): GitHubProfile {
 	const originalStars = originalRepos.reduce((sum, repo) => sum + repo.stargazerCount, 0);
 	const totalForks = repositories.reduce((sum, repo) => sum + repo.forkCount, 0);
 
+	const organizations: GitHubOrganization[] = (user.organizations?.nodes || []).map((org) => ({
+		login: org.login,
+		name: org.name,
+		avatarUrl: org.avatarUrl,
+		url: org.url,
+		description: org.description
+	}));
+
 	return {
 		user: {
 			login: user.login,
@@ -424,6 +438,7 @@ function transformGraphQLResponse(data: GraphQLUserResponse): GitHubProfile {
 		pinnedRepositories: pinnedRepositories.length > 0 ? pinnedRepositories : originalRepos.slice(0, 6),
 		contributions,
 		languages,
+		organizations,
 		stats: {
 			totalRepos: user.repositories.totalCount,
 			totalStars,
@@ -437,7 +452,7 @@ function transformGraphQLResponse(data: GraphQLUserResponse): GitHubProfile {
 }
 
 // Transform REST response to normalized profile
-function transformRESTResponse(userData: RESTUserResponse, reposData: RESTRepoResponse[]): GitHubProfile {
+function transformRESTResponse(userData: RESTUserResponse, reposData: RESTRepoResponse[], orgsData: RESTOrgResponse[]): GitHubProfile {
 	// Include all public repos (both original and forks)
 	const repositories: GitHubRepository[] = reposData
 		.filter((repo) => !repo.private)
@@ -468,6 +483,14 @@ function transformRESTResponse(userData: RESTUserResponse, reposData: RESTRepoRe
 	const originalStars = originalRepos.reduce((sum, repo) => sum + repo.stargazerCount, 0);
 	const totalForks = repositories.reduce((sum, repo) => sum + repo.forkCount, 0);
 
+	const organizations: GitHubOrganization[] = orgsData.map((org) => ({
+		login: org.login,
+		name: null,
+		avatarUrl: org.avatar_url,
+		url: `https://github.com/${org.login}`,
+		description: org.description
+	}));
+
 	return {
 		user: {
 			login: userData.login,
@@ -488,6 +511,7 @@ function transformRESTResponse(userData: RESTUserResponse, reposData: RESTRepoRe
 		pinnedRepositories: originalRepos.slice(0, 6), // REST API doesn't have pinned items
 		contributions: null, // REST API doesn't have contribution data
 		languages,
+		organizations,
 		stats: {
 			totalRepos: userData.public_repos,
 			totalStars,

@@ -69,6 +69,24 @@
 				</a>
 			{/if}
 		</div>
+		{#if profile.organizations && profile.organizations.length > 0}
+			<div class="mt-6 flex flex-wrap items-center justify-center gap-2">
+				{#each profile.organizations.slice(0, 8) as org (org.login)}
+					<a
+						href={org.url}
+						target="_blank"
+						rel="noopener noreferrer"
+						title={org.name || org.login}
+					>
+						<img
+							src={org.avatarUrl}
+							alt={org.login}
+							class="h-7 w-7 rounded-md border border-border-default bg-bg-tertiary"
+						/>
+					</a>
+				{/each}
+			</div>
+		{/if}
 	</header>
 
 	<!-- Stats Row -->
