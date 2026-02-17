@@ -71,7 +71,26 @@
 					{/each}
 				</div>
 
-				<div class="mt-4 flex items-center gap-4 text-sm text-text-tertiary">
+				{#if profile.organizations && profile.organizations.length > 0}
+				<div class="mt-4 flex flex-wrap items-center gap-2">
+					{#each profile.organizations.slice(0, 6) as org (org.login)}
+						<a
+							href={org.url}
+							target="_blank"
+							rel="noopener noreferrer"
+							title={org.name || org.login}
+						>
+							<img
+								src={org.avatarUrl}
+								alt={org.login}
+								class="h-6 w-6 rounded-md border border-border-default bg-bg-tertiary"
+							/>
+						</a>
+					{/each}
+				</div>
+			{/if}
+
+			<div class="mt-4 flex items-center gap-4 text-sm text-text-tertiary">
 					{#if profile.user.location}
 						<span class="flex items-center gap-1">
 							<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

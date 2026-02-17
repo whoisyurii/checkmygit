@@ -1,7 +1,7 @@
 import { DEDUP_COOKIE_NAME, DEDUP_WINDOW_MS, MAX_TRACKED_PROFILES } from './constants';
 import type { SeenProfile, CookieAccessor } from './types';
-import { createHmac } from 'crypto'; // NEW
-import { IP_HASH_SECRET } from '$env/static/private'; // NEW
+import { createHmac } from 'crypto';
+import { env } from '$env/dynamic/private';
 
 export function parseSeenCookie(cookieValue: string | undefined): SeenProfile[] {
 	if (!cookieValue) return [];
@@ -109,6 +109,7 @@ const SECRET_MIN_LENGTH = 32; // Enforce strong secrets
 // --- NEW ADDITION ---
 // Generate a secure hash of the IP address for privacy-preserving deduplication
 export function getIpHash(ip: string): string {
+	const IP_HASH_SECRET = env.IP_HASH_SECRET;
 	if (!IP_HASH_SECRET || IP_HASH_SECRET.length < SECRET_MIN_LENGTH) {
 		throw new Error(
 			`IP_HASH_SECRET is not configured or is too short (min ${SECRET_MIN_LENGTH} chars).`

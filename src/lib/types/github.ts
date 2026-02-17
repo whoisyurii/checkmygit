@@ -102,6 +102,15 @@ export interface LanguageStats {
 	size: number;
 }
 
+// GitHub Organization Types
+export interface GitHubOrganization {
+	login: string;
+	name: string | null;
+	avatarUrl: string;
+	url: string;
+	description: string | null;
+}
+
 // Normalized GitHub Profile (used by app)
 export interface GitHubProfile {
 	user: GitHubUser;
@@ -109,6 +118,7 @@ export interface GitHubProfile {
 	pinnedRepositories: GitHubRepository[];
 	contributions: ContributionsCollection | null;
 	languages: LanguageStats[];
+	organizations?: GitHubOrganization[];
 	stats: {
 		totalRepos: number;
 		totalStars: number;
@@ -134,6 +144,15 @@ export interface GraphQLUserResponse {
 		email: string | null;
 		followers: { totalCount: number };
 		following: { totalCount: number };
+		organizations: {
+			nodes: Array<{
+				login: string;
+				name: string | null;
+				avatarUrl: string;
+				url: string;
+				description: string | null;
+			}>;
+		};
 		createdAt: string;
 		updatedAt: string;
 		repositories: {
@@ -259,6 +278,12 @@ export interface RESTRepoResponse {
 	topics: string[];
 	pushed_at: string | null;
 	created_at: string;
+}
+
+export interface RESTOrgResponse {
+	login: string;
+	description: string | null;
+	avatar_url: string;
 }
 
 // API Error Types
