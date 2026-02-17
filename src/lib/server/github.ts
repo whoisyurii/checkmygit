@@ -187,7 +187,7 @@ async function fetchUserGraphQL(username: string): Promise<GitHubResult<GitHubPr
 
 		const json = (await response.json()) as { data?: GraphQLUserResponse; errors?: Array<{ message: string }> };
 
-		if (json.errors) {
+		if (json.errors && !json.data?.user) {
 			const notFound = json.errors.some((e) => e.message.includes('Could not resolve'));
 			if (notFound) {
 				return {
