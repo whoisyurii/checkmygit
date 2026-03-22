@@ -35,12 +35,9 @@ async function fetchAvatarAsDataUrl(avatarUrl: string): Promise<string | null> {
 	}
 }
 
-export async function generateOGImage(
-	profile: GitHubProfile,
-	originUrl: string
-): Promise<Uint8Array> {
+export async function generateOGImage(profile: GitHubProfile): Promise<Uint8Array> {
 	// Initialize resvg WASM (cached after first call)
-	await ensureResvgInitialized(originUrl);
+	await ensureResvgInitialized();
 
 	// Load fonts (cached after first call)
 	const fonts = await loadFonts();
