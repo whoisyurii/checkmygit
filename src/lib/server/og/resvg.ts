@@ -1,5 +1,5 @@
 // WASM initialization wrapper for @resvg/resvg-wasm
-// Fetches WASM binary from jsDelivr CDN (worker can't fetch its own static assets)
+// Loads WASM as ArrayBuffer from CDN (CF Workers need explicit init)
 
 import { initWasm, Resvg } from '@resvg/resvg-wasm';
 
@@ -15,7 +15,8 @@ export async function ensureResvgInitialized(): Promise<void> {
 		throw new Error(`Failed to fetch resvg WASM: ${wasmResponse.status}`);
 	}
 
-	await initWasm(wasmResponse);
+	const wasmBuffer = await wasmResponse.arrayBuffer();
+	await initWasm(wasmBuffer);
 	initialized = true;
 }
 

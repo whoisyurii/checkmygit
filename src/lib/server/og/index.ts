@@ -1,7 +1,7 @@
 // OG Image generation orchestrator
-// Combines font loading, card building, Satori SVG rendering, and Resvg PNG conversion
+// Uses satori/standalone with explicit WASM init for Cloudflare Workers compatibility
 
-import satori from 'satori';
+import satori, { init as initSatori } from 'satori/standalone';
 import type { GitHubProfile } from '$lib/types/github';
 import { loadFonts } from './font';
 import { ensureResvgInitialized, Resvg } from './resvg';
@@ -9,7 +9,24 @@ import { buildOGCard } from './card';
 
 const OG_WIDTH = 1200;
 const OG_HEIGHT = 630;
-const OG_SCALE = 2; // Render at 2x for crisp output
+const OG_SCALE = 2;
+
+const YOGA_WASM_URL = 'https://cdn.jsdelivr.net/npm/satori@0.26.0/yoga.wasm';
+
+let satoriReady = false;
+
+async function ensureSatoriInitialized(): Promise<void> {
+	if (satoriReady) return;
+
+	const yogaResponse = await fetch(YOGA_WASM_URL);
+	if (!yogaResponse.ok) {
+		throw new Error(`Failed to fetch yoga WASM: ${yogaResponse.status}`);
+	}
+
+	const yogaWasm = await yogaResponse.arrayBuffer();
+	await initSatori(yogaWasm);
+	satoriReady = true;
+}
 
 function arrayBufferToBase64(buffer: ArrayBuffer): string {
 	const bytes = new Uint8Array(buffer);
@@ -36,8 +53,8 @@ async function fetchAvatarAsDataUrl(avatarUrl: string): Promise<string | null> {
 }
 
 export async function generateOGImage(profile: GitHubProfile): Promise<Uint8Array> {
-	// Initialize resvg WASM (cached after first call)
-	await ensureResvgInitialized();
+	// Initialize both WASM runtimes from CDN (cached after first call)
+	await Promise.all([ensureSatoriInitialized(), ensureResvgInitialized()]);
 
 	// Load fonts (cached after first call)
 	const fonts = await loadFonts();
@@ -48,7 +65,7 @@ export async function generateOGImage(profile: GitHubProfile): Promise<Uint8Arra
 	// Build the card virtual DOM
 	const cardVdom = buildOGCard(profile, avatarDataUrl);
 
-	// Render to SVG via Satori (yoga WASM is base64-inlined in yoga-layout)
+	// Render to SVG via Satori
 	const svg = await satori(cardVdom as any, {
 		width: OG_WIDTH,
 		height: OG_HEIGHT,
@@ -68,7 +85,7 @@ export async function generateOGImage(profile: GitHubProfile): Promise<Uint8Arra
 		]
 	});
 
-	// Convert SVG to PNG at 2x resolution for crisp output
+	// Convert SVG to PNG at 2x resolution
 	const resvg = new Resvg(svg, {
 		fitTo: { mode: 'width', value: OG_WIDTH * OG_SCALE }
 	});
