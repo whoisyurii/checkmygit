@@ -77,15 +77,15 @@ export const GET: RequestHandler = async ({ params, platform }) => {
 
 		return response;
 	} catch (err) {
-		console.error('OG image generation failed:', err);
+		const errorMsg = err instanceof Error ? err.message : String(err);
+		console.error('OG image generation failed:', errorMsg);
 
-		// Graceful degradation: redirect to GitHub avatar
-		const avatarUrl = `${result.data.user.avatarUrl}&s=1200`;
-		return new Response(null, {
-			status: 302,
+		// Return error as JSON so we can debug on production
+		return new Response(JSON.stringify({ error: errorMsg }), {
+			status: 500,
 			headers: {
-				Location: avatarUrl,
-				'Cache-Control': 'public, max-age=300'
+				'Content-Type': 'application/json',
+				'Cache-Control': 'no-cache'
 			}
 		});
 	}
