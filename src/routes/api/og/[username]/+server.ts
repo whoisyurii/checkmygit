@@ -10,9 +10,8 @@ function buildCacheKey(username: string): string {
 	return `${OG_CACHE_KEY_PREFIX}${username.toLowerCase()}`;
 }
 
-export const GET: RequestHandler = async ({ params, url, platform }) => {
+export const GET: RequestHandler = async ({ params, platform }) => {
 	const { username } = params;
-	const originUrl = url.origin;
 
 	// Try edge cache first
 	if (platform?.caches) {
@@ -45,7 +44,7 @@ export const GET: RequestHandler = async ({ params, url, platform }) => {
 	}
 
 	try {
-		const png = await generateOGImage(result.data, originUrl);
+		const png = await generateOGImage(result.data);
 
 		const response = new Response(png, {
 			headers: {
