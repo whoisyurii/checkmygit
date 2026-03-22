@@ -177,11 +177,12 @@
 	<meta name="description" content="GitHub portfolio for {profile?.user.name || data.username}. {profile?.user.bio || 'View their projects and contributions.'}" />
 	<meta property="og:title" content="{profile?.user.name || data.username} - CheckMyGit" />
 	<meta property="og:description" content="{profile?.user.bio || `GitHub portfolio for ${data.username}`}" />
-	{#if profile?.user.avatarUrl}
-		<meta property="og:image" content="{profile.user.avatarUrl}" />
-	{/if}
+	<meta property="og:image" content="{$page.url.origin}/api/og/{data.username}" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
 	<meta property="og:type" content="profile" />
 	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:image" content="{$page.url.origin}/api/og/{data.username}" />
 </svelte:head>
 
 <div class:page-enter={showEnterAnimation}>
