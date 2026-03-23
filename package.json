@@ -40,11 +40,9 @@
 		"vite": "^7.2.6"
 	},
 	"dependencies": {
-		"@resvg/resvg-wasm": "^2.6.2",
 		"@sveltejs/adapter-cloudflare": "^7.2.4",
 		"html-to-image": "^1.11.13",
 		"qrcode": "^1.5.4",
-		"satori": "^0.26.0",
 		"svelte-ionicons": "^3.0.1"
 	}
 }
