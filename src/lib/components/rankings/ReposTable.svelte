@@ -41,6 +41,10 @@
 						<img
 							src={repo.owner.avatarUrl}
 							alt={repo.owner.login}
+							width="32"
+							height="32"
+							loading="lazy"
+							decoding="async"
 							class="h-8 w-8 rounded-full"
 						/>
 						<div class="min-w-0">

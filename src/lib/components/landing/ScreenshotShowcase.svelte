@@ -51,6 +51,8 @@
 					src={screenshotImg}
 					alt="CheckMyGit portfolio preview showing GitHub stats, contributions, and projects"
 					class="block w-full h-auto"
+					fetchpriority="high"
+					decoding="async"
 				/>
 
 				<!-- Subtle overlay gradient at bottom -->
