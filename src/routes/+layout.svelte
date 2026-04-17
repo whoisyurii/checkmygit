@@ -1,5 +1,7 @@
 <script lang="ts">
 	import './layout.css';
+	import { page } from '$app/stores';
+	import { SITE_URL } from '$lib/constants';
 	import { toastState } from '$lib/stores/generator.svelte';
 	import { navigationState } from '$lib/stores/navigation.svelte';
 	import { themeState } from '$lib/stores/theme.svelte';
@@ -18,10 +20,9 @@
 </script>
 
 <svelte:head>
-	<title>CheckMyGit - GitHub Portfolio Generator</title>
-	<meta name="description" content="Generate beautiful portfolio pages from your GitHub profile. Showcase your projects, contributions, and skills." />
 	<meta name="theme-color" content={themeState.isDark ? '#030303' : '#FFFFFF'} />
 	<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+	<link rel="canonical" href="{SITE_URL}{$page.url.pathname}" />
 </svelte:head>
 
 <div class="min-h-screen bg-bg-primary" class:page-exit={isExiting}>

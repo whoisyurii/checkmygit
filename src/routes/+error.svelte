@@ -7,16 +7,12 @@
 
 	const statusMessages: Record<number, { title: string; description: string }> = {
 		404: {
-			title: 'User not found',
-			description: 'The GitHub user you\'re looking for doesn\'t exist or has been deleted.'
-		},
-		429: {
-			title: 'Rate limit exceeded',
-			description: 'We\'ve hit GitHub\'s API rate limit. Please try again in a few minutes.'
+			title: 'Page not found',
+			description: "The page you're looking for doesn't exist or has moved."
 		},
 		500: {
 			title: 'Something went wrong',
-			description: 'An error occurred while fetching the profile. Please try again.'
+			description: 'An unexpected error occurred. Please try again.'
 		}
 	};
 
@@ -43,12 +39,7 @@
 			{$page.error?.message || message.description}
 		</p>
 		<div class="mt-6 flex justify-center gap-3">
-			<Button variant="primary" href="/">
-				Go Home
-			</Button>
-			<Button variant="secondary" onclick={() => window.location.reload()}>
-				Try Again
-			</Button>
+			<Button variant="primary" href="/">Go Home</Button>
 		</div>
 	</Card>
 </main>
