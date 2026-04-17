@@ -17,7 +17,7 @@
 	import { generateShareUrl } from '$lib/utils/github-transform';
 	import { generateQRCode } from '$lib/utils/qr';
 	import { jsonLd } from '$lib/utils/jsonld';
-	import { SITE_URL } from '$lib/constants';
+	import { SITE_URL, META_DESCRIPTION_MAX_LENGTH } from '$lib/constants';
 	import type { TemplateType } from '$lib/types/portfolio';
 	import type { GitHubProfile } from '$lib/types/github';
 
@@ -49,19 +49,19 @@
 	// Track if we came from a navigation (for enter animation)
 	let showEnterAnimation = $derived(navigationState.phase === 'entering');
 
-	const displayName = $derived(profile?.user.name ?? data.username);
 	const profileUrl = $derived(`${SITE_URL}/${data.username}`);
 
 	const pageTitle = $derived(
 		profile?.user.name
-			? `${profile.user.name} (@${data.username}) · GitHub Portfolio | CheckMyGit`
-			: `@${data.username} · GitHub Portfolio | CheckMyGit`
+			? `${profile.user.name} (@${data.username}) - GitHub Portfolio - CheckMyGit`
+			: `@${data.username} - GitHub Portfolio - CheckMyGit`
 	);
 
 	const pageDescription = $derived.by(() => {
 		if (!profile) {
 			return `GitHub portfolio for @${data.username} — contributions, repositories, languages, and pinned projects.`;
 		}
+		const name = profile.user.name || data.username;
 		const topLang = profile.languages[0]?.name;
 		const parts = [
 			`${profile.stats.totalRepos} repos`,
@@ -70,7 +70,10 @@
 		];
 		if (topLang) parts.push(`${topLang} top language`);
 		const stats = parts.join(' · ');
-		return `${displayName}'s GitHub portfolio on CheckMyGit — ${stats}.`.slice(0, 160);
+		return `${name}'s GitHub portfolio on CheckMyGit — ${stats}.`.slice(
+			0,
+			META_DESCRIPTION_MAX_LENGTH
+		);
 	});
 
 	const profileSchema = $derived.by(() => {
@@ -81,20 +84,22 @@
 		}
 		if (profile.user.websiteUrl) sameAs.push(profile.user.websiteUrl);
 
+		const person: Record<string, unknown> = {
+			'@type': 'Person',
+			name: profile.user.name || profile.user.login,
+			alternateName: profile.user.login,
+			url: profileUrl,
+			image: profile.user.avatarUrl,
+			sameAs
+		};
+		if (profile.user.bio) person.description = profile.user.bio;
+
 		return {
 			'@context': 'https://schema.org',
 			'@type': 'ProfilePage',
 			url: profileUrl,
 			dateModified: profile.user.updatedAt,
-			mainEntity: {
-				'@type': 'Person',
-				name: profile.user.name || profile.user.login,
-				alternateName: profile.user.login,
-				url: profileUrl,
-				image: profile.user.avatarUrl,
-				description: profile.user.bio || undefined,
-				sameAs
-			},
+			mainEntity: person,
 			breadcrumb: {
 				'@type': 'BreadcrumbList',
 				itemListElement: [
