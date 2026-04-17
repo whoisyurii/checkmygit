@@ -16,6 +16,8 @@
 	import { themeState } from '$lib/stores/theme.svelte';
 	import { generateShareUrl } from '$lib/utils/github-transform';
 	import { generateQRCode } from '$lib/utils/qr';
+	import { jsonLd } from '$lib/utils/jsonld';
+	import { SITE_URL } from '$lib/constants';
 	import type { TemplateType } from '$lib/types/portfolio';
 	import type { GitHubProfile } from '$lib/types/github';
 
@@ -46,6 +48,62 @@
 
 	// Track if we came from a navigation (for enter animation)
 	let showEnterAnimation = $derived(navigationState.phase === 'entering');
+
+	const displayName = $derived(profile?.user.name ?? data.username);
+	const profileUrl = $derived(`${SITE_URL}/${data.username}`);
+
+	const pageTitle = $derived(
+		profile?.user.name
+			? `${profile.user.name} (@${data.username}) · GitHub Portfolio | CheckMyGit`
+			: `@${data.username} · GitHub Portfolio | CheckMyGit`
+	);
+
+	const pageDescription = $derived.by(() => {
+		if (!profile) {
+			return `GitHub portfolio for @${data.username} — contributions, repositories, languages, and pinned projects.`;
+		}
+		const topLang = profile.languages[0]?.name;
+		const parts = [
+			`${profile.stats.totalRepos} repos`,
+			`${profile.stats.totalStars.toLocaleString()} stars`,
+			`${profile.stats.followers.toLocaleString()} followers`
+		];
+		if (topLang) parts.push(`${topLang} top language`);
+		const stats = parts.join(' · ');
+		return `${displayName}'s GitHub portfolio on CheckMyGit — ${stats}.`.slice(0, 160);
+	});
+
+	const profileSchema = $derived.by(() => {
+		if (!profile) return null;
+		const sameAs: string[] = [`https://github.com/${profile.user.login}`];
+		if (profile.user.twitterUsername) {
+			sameAs.push(`https://twitter.com/${profile.user.twitterUsername}`);
+		}
+		if (profile.user.websiteUrl) sameAs.push(profile.user.websiteUrl);
+
+		return {
+			'@context': 'https://schema.org',
+			'@type': 'ProfilePage',
+			url: profileUrl,
+			dateModified: profile.user.updatedAt,
+			mainEntity: {
+				'@type': 'Person',
+				name: profile.user.name || profile.user.login,
+				alternateName: profile.user.login,
+				url: profileUrl,
+				image: profile.user.avatarUrl,
+				description: profile.user.bio || undefined,
+				sameAs
+			},
+			breadcrumb: {
+				'@type': 'BreadcrumbList',
+				itemListElement: [
+					{ '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+					{ '@type': 'ListItem', position: 2, name: profile.user.login, item: profileUrl }
+				]
+			}
+		};
+	});
 
 	// Signal that the profile has loaded - trigger enter animation
 	onMount(() => {
@@ -173,15 +231,23 @@
 </script>
 
 <svelte:head>
-	<title>{profile?.user.name || data.username} - CheckMyGit</title>
-	<meta name="description" content="GitHub portfolio for {profile?.user.name || data.username}. {profile?.user.bio || 'View their projects and contributions.'}" />
-	<meta property="og:title" content="{profile?.user.name || data.username} - CheckMyGit" />
-	<meta property="og:description" content="{profile?.user.bio || `GitHub portfolio for ${data.username}`}" />
-	{#if profile?.user.avatarUrl}
-		<meta property="og:image" content="{profile.user.avatarUrl}" />
-	{/if}
+	<title>{pageTitle}</title>
+	<meta name="description" content={pageDescription} />
+	<meta property="og:title" content={pageTitle} />
+	<meta property="og:description" content={pageDescription} />
+	<meta property="og:url" content={profileUrl} />
+	<meta property="og:site_name" content="CheckMyGit" />
 	<meta property="og:type" content="profile" />
+	{#if profile?.user.avatarUrl}
+		<meta property="og:image" content={profile.user.avatarUrl} />
+	{/if}
 	<meta name="twitter:card" content="summary_large_image" />
+	{#if profile?.user.twitterUsername}
+		<meta name="twitter:creator" content="@{profile.user.twitterUsername}" />
+	{/if}
+	{#if profileSchema}
+		{@html jsonLd(profileSchema)}
+	{/if}
 </svelte:head>
 
 <div class:page-enter={showEnterAnimation}>

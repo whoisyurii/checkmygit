@@ -31,6 +31,10 @@
 							<img
 								src="https://github.com/{profile.username}.png"
 								alt={profile.name}
+								width="48"
+								height="48"
+								loading="lazy"
+								decoding="async"
 								class="h-12 w-12 rounded-full border border-border-subtle bg-bg-secondary"
 							/>
 							<div class="absolute -bottom-1 -right-1 rounded-full border-2 border-bg-tertiary bg-accent-green p-1"></div>

@@ -41,6 +41,10 @@
 						<img
 							src={user.avatarUrl}
 							alt={user.login}
+							width="40"
+							height="40"
+							loading="lazy"
+							decoding="async"
 							class="h-10 w-10 rounded-full"
 						/>
 						<div class="min-w-0">

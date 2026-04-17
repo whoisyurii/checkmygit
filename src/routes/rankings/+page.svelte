@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { SITE_URL } from '$lib/constants';
+	import { jsonLd } from '$lib/utils/jsonld';
 	import Header from '$lib/components/layout/Header.svelte';
 	import Footer from '$lib/components/layout/Footer.svelte';
 	import ReposTable from '$lib/components/rankings/ReposTable.svelte';
@@ -78,6 +80,34 @@
 		{ id: 'users', label: 'Top Users', icon: 'user' }
 	];
 
+	const rankingsSchema = $derived.by(() => {
+		const items =
+			activeTab === 'users'
+				? sortedUsers.map((user) => ({
+						'@type': 'ListItem',
+						position: user.rank,
+						url: `${SITE_URL}/${user.login}`,
+						name: user.name || user.login
+					}))
+				: resolvedRepos.map((repo, i) => ({
+						'@type': 'ListItem',
+						position: i + 1,
+						url: repo.url,
+						name: repo.nameWithOwner
+					}));
+
+		if (items.length === 0) return null;
+
+		return {
+			'@context': 'https://schema.org',
+			'@type': 'ItemList',
+			name: activeTab === 'users' ? 'Top GitHub Developers' : 'Top GitHub Repositories',
+			url: `${SITE_URL}/rankings?tab=${activeTab}`,
+			numberOfItems: items.length,
+			itemListElement: items
+		};
+	});
+
 	function switchTab(tabId: string) {
 		// Use goto to trigger server data reload for the new tab
 		const url = new URL($page.url);
@@ -128,6 +158,9 @@
 		name="description"
 		content="Discover the most starred repositories and most followed developers on GitHub."
 	/>
+	{#if rankingsSchema}
+		{@html jsonLd(rankingsSchema)}
+	{/if}
 </svelte:head>
 
 <Header />
