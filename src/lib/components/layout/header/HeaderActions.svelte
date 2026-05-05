@@ -2,7 +2,9 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import FireIcon from '$lib/components/ui/FireIcon.svelte';
 	import ThemeToggle from '$lib/components/ui/ThemeToggle.svelte';
-	import { REPO_URL, GITHUB_API_URL } from '$lib/constants';
+	import { REPO_URL } from '$lib/constants';
+	import { githubStarsState } from '$lib/stores/githubStars.svelte';
+	import { formatNumber } from '$lib/utils/github-transform';
 
 	interface Props {
 		showControls?: boolean;
@@ -13,27 +15,9 @@
 
 	let { showControls = false, onExport, onShare, onQRCode }: Props = $props();
 
-	let starCount = $state<number | null>(null);
-
 	$effect(() => {
-		fetch(GITHUB_API_URL)
-			.then((res) => res.json())
-			.then((data) => {
-				if (typeof data.stargazers_count === 'number') {
-					starCount = data.stargazers_count;
-				}
-			})
-			.catch(() => {
-				// Silently fail - button will still work without count
-			});
+		githubStarsState.init();
 	});
-
-	function formatStarCount(count: number): string {
-		if (count >= 1000) {
-			return (count / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
-		}
-		return count.toString();
-	}
 </script>
 
 <div class="flex shrink-0 items-center gap-2">
@@ -99,10 +83,13 @@
 				d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z"
 			/>
 		</svg>
-		{#if starCount !== null}
-			<span>{formatStarCount(starCount)} <span class="hidden sm:inline">Github</span></span>
-		{:else}
-			<span class="hidden sm:inline"> Github</span>
-		{/if}
+		<span class="inline-flex items-center gap-1">
+			{#if githubStarsState.count !== null}
+				<span class="tabular-nums">{formatNumber(githubStarsState.count)}</span>
+			{:else}
+				<span aria-hidden="true" class="inline-block h-3 w-7 animate-pulse rounded bg-text-tertiary/30"></span>
+			{/if}
+			<span class="hidden sm:inline">Github</span>
+		</span>
 	</Button>
 </div>
