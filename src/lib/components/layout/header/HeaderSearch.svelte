@@ -8,7 +8,6 @@
 	let { username = '' }: Props = $props();
 
 	let searchValue = $state('');
-	let searchFocused = $state(false);
 
 	// Sync searchValue with the username prop whenever it changes
 	$effect(() => {
@@ -33,8 +32,6 @@
 		placeholder="Search users..."
 		bind:value={searchValue}
 		onkeydown={handleSearch}
-		onfocus={() => searchFocused = true}
-		onblur={() => searchFocused = false}
-		class="h-9 w-full rounded-lg border bg-bg-secondary pl-9 pr-3 text-sm text-text-primary placeholder-text-tertiary transition-all focus:border-saas-green focus:bg-bg-secondary focus:outline-none focus:ring-1 focus:ring-saas-green {searchFocused ? 'border-saas-green' : 'border-border-default'}"
+		class="h-9 w-full rounded-lg border border-border-default bg-bg-secondary pl-9 pr-3 text-sm text-text-primary placeholder-text-tertiary transition-all focus:border-saas-green focus:bg-bg-secondary focus:outline-none focus:ring-1 focus:ring-saas-green"
 	/>
 </div>
