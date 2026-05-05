@@ -22,6 +22,10 @@
 		<img
 			src={profile.user.avatarUrl}
 			alt={profile.user.login}
+			width="296"
+			height="296"
+			fetchpriority="high"
+			decoding="async"
 			class="h-74 w-74 rounded-full border-4 border-border-default bg-bg-tertiary"
 		/>
 	</div>
@@ -196,6 +200,10 @@
 						<img
 							src={org.avatarUrl}
 							alt={org.login}
+							width="32"
+							height="32"
+							loading="lazy"
+							decoding="async"
 							class="h-8 w-8 rounded-md border border-border-default bg-bg-tertiary"
 						/>
 					</a>

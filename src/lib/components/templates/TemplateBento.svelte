@@ -47,6 +47,10 @@
 					<img
 						src={profile.user.avatarUrl}
 						alt={profile.user.login}
+						width="80"
+						height="80"
+						fetchpriority="high"
+						decoding="async"
 						class="h-20 w-20 rounded-full border-2 border-border-default"
 					/>
 					<div class="flex-1">

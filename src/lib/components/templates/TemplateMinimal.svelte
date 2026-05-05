@@ -36,6 +36,10 @@
 		<img
 			src={profile.user.avatarUrl}
 			alt={profile.user.login}
+			width="128"
+			height="128"
+			fetchpriority="high"
+			decoding="async"
 			class="mx-auto mb-6 h-32 w-32 rounded-full border-4 border-border-default"
 		/>
 		<h1 class="text-4xl font-bold text-text-primary">
