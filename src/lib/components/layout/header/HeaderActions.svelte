@@ -37,14 +37,13 @@
 </script>
 
 <div class="flex shrink-0 items-center gap-2">
-	<!-- Trending Link -->
-	<Button variant="ghost" size="sm" href="/trending">
+	<!-- Hidden in profile preview on mobile to avoid header overflow -->
+	<Button variant="ghost" size="sm" href="/trending" class={showControls ? 'hidden! sm:inline-flex!' : ''}>
 		<FireIcon size={16} />
 		<span class="hidden sm:inline">Trending</span>
 	</Button>
 
-	<!-- Rankings Link -->
-	<Button variant="ghost" size="sm" href="/rankings">
+	<Button variant="ghost" size="sm" href="/rankings" class={showControls ? 'hidden! sm:inline-flex!' : ''}>
 		<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 			<path
 				stroke-linecap="round"
