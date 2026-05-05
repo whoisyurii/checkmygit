@@ -1,22 +1,49 @@
 import type { RequestHandler } from './$types';
 import { SITE_URL } from '$lib/constants';
 import { fetchTopUsers } from '$lib/server/rankings';
+import { RANKING_LANGUAGES } from '$lib/types/rankings';
 
-const CACHE_KEY = `${SITE_URL}/__sitemap_cache_v1`;
+const CACHE_KEY = `${SITE_URL}/__sitemap_cache_v2`;
 const CACHE_TTL_SECONDS = 60 * 60 * 24;
+
+type Changefreq = 'daily' | 'weekly' | 'monthly';
 
 type StaticUrl = {
 	path: string;
-	changefreq: 'daily' | 'weekly' | 'monthly';
+	changefreq: Changefreq;
 	priority: string;
 };
 
 const STATIC_URLS: StaticUrl[] = [
 	{ path: '/', changefreq: 'weekly', priority: '1.0' },
 	{ path: '/rankings', changefreq: 'daily', priority: '0.9' },
+	{ path: '/trending', changefreq: 'daily', priority: '0.9' },
+	{ path: '/trending?since=weekly', changefreq: 'weekly', priority: '0.8' },
+	{ path: '/trending?since=monthly', changefreq: 'monthly', priority: '0.7' },
 	{ path: '/about', changefreq: 'monthly', priority: '0.5' },
 	{ path: '/privacy', changefreq: 'monthly', priority: '0.3' }
 ];
+
+const TRENDING_LANG_PRIORITIES: Record<Changefreq, string> = {
+	daily: '0.7',
+	weekly: '0.6',
+	monthly: '0.5'
+};
+
+function buildTrendingLanguageUrls(): StaticUrl[] {
+	const urls: StaticUrl[] = [];
+	for (const lang of RANKING_LANGUAGES) {
+		const langParam = encodeURIComponent(lang);
+		(['daily', 'weekly', 'monthly'] as const).forEach((since) => {
+			urls.push({
+				path: `/trending?language=${langParam}&since=${since}`,
+				changefreq: since,
+				priority: TRENDING_LANG_PRIORITIES[since]
+			});
+		});
+	}
+	return urls;
+}
 
 function escapeXml(value: string): string {
 	return value
@@ -30,10 +57,12 @@ function escapeXml(value: string): string {
 function buildSitemap(userLogins: string[]): string {
 	const lastmod = new Date().toISOString().split('T')[0];
 
-	const staticEntries = STATIC_URLS.map(
+	const allStatic = [...STATIC_URLS, ...buildTrendingLanguageUrls()];
+
+	const staticEntries = allStatic.map(
 		({ path, changefreq, priority }) =>
 			`  <url>\n` +
-			`    <loc>${SITE_URL}${path}</loc>\n` +
+			`    <loc>${SITE_URL}${escapeXml(path)}</loc>\n` +
 			`    <lastmod>${lastmod}</lastmod>\n` +
 			`    <changefreq>${changefreq}</changefreq>\n` +
 			`    <priority>${priority}</priority>\n` +

@@ -1,0 +1,250 @@
+<script lang="ts">
+	import { pushState } from '$app/navigation';
+	import Header from '$lib/components/layout/Header.svelte';
+	import Footer from '$lib/components/layout/Footer.svelte';
+	import Card from '$lib/components/ui/Card.svelte';
+	import FireIcon from '$lib/components/ui/FireIcon.svelte';
+	import SegmentedTabs from '$lib/components/ui/SegmentedTabs.svelte';
+	import TrendingTable from '$lib/components/rankings/TrendingTable.svelte';
+	import TrendingTableSkeleton from '$lib/components/rankings/TrendingTableSkeleton.svelte';
+	import TrendingFilters from '$lib/components/rankings/TrendingFilters.svelte';
+	import { SITE_URL } from '$lib/constants';
+	import {
+		TRENDING_WINDOWS,
+		WINDOW_LABEL,
+		WINDOW_PERIOD_TEXT,
+		DEFAULT_TRENDING_WINDOW,
+		type TrendingWindow,
+		type TrendingResult
+	} from '$lib/types/trending';
+
+	const windowItems = TRENDING_WINDOWS.map((w) => ({ value: w, label: WINDOW_LABEL[w] }));
+
+	let { data } = $props();
+
+	// Local state seeded from server load. Tab/filter changes use pushState (no full
+	// reload), so subsequent UI must drive off these refs rather than `data`. The $effect
+	// below re-syncs when the loader actually re-runs (e.g. external nav to /trending).
+	/* svelte-ignore state_referenced_locally */
+	let since = $state<TrendingWindow>(data.since);
+	/* svelte-ignore state_referenced_locally */
+	let language = $state<string>(data.language);
+	/* svelte-ignore state_referenced_locally */
+	let repos = $state<TrendingResult>(data.repos);
+	let loading = $state(false);
+
+	let inFlightFetch: AbortController | null = null;
+
+	// Re-sync when the load function actually re-runs (e.g. arriving via a header link
+	// to /trending with different params). pushState-driven changes don't fire this.
+	// Cancel any client fetch first so a stale response can't clobber fresh server data.
+	$effect(() => {
+		if (inFlightFetch) {
+			inFlightFetch.abort();
+			inFlightFetch = null;
+		}
+		since = data.since;
+		language = data.language;
+		repos = data.repos;
+		loading = false;
+	});
+
+	$effect(() => {
+		const handler = () => {
+			const u = new URL(window.location.href);
+			const nextSince = (u.searchParams.get('since') as TrendingWindow) || DEFAULT_TRENDING_WINDOW;
+			const nextLang = u.searchParams.get('language') || '';
+			if (nextSince === since && nextLang === language) return;
+			since = nextSince;
+			language = nextLang;
+			void fetchData();
+		};
+		window.addEventListener('popstate', handler);
+		return () => window.removeEventListener('popstate', handler);
+	});
+
+	async function fetchData() {
+		inFlightFetch?.abort();
+		const controller = new AbortController();
+		inFlightFetch = controller;
+		loading = true;
+
+		const apiUrl = new URL('/api/trending', window.location.origin);
+		apiUrl.searchParams.set('since', since);
+		if (language) apiUrl.searchParams.set('language', language);
+
+		try {
+			const res = await fetch(apiUrl.toString(), { signal: controller.signal });
+			const result = (await res.json()) as TrendingResult;
+			if (inFlightFetch === controller) repos = result;
+		} catch (err) {
+			if (err instanceof DOMException && err.name === 'AbortError') return;
+			if (inFlightFetch === controller) {
+				repos = { success: false, data: [], source: 'fallback', error: 'Failed to load' };
+			}
+		} finally {
+			if (inFlightFetch === controller) {
+				loading = false;
+				inFlightFetch = null;
+			}
+		}
+	}
+
+	function pushTrendingUrl() {
+		const url = new URL('/trending', window.location.origin);
+		if (since !== DEFAULT_TRENDING_WINDOW) url.searchParams.set('since', since);
+		if (language) url.searchParams.set('language', language);
+		pushState(url, {});
+	}
+
+	async function switchWindow(next: TrendingWindow) {
+		if (next === since) return;
+		since = next;
+		pushTrendingUrl();
+		await fetchData();
+	}
+
+	async function changeLanguage(next: string) {
+		if (next === language) return;
+		language = next;
+		pushTrendingUrl();
+		await fetchData();
+	}
+
+	const langPrefix = $derived(language ? `${language} ` : '');
+	const titleBase = $derived(`🔥 Trending ${langPrefix}Repos ${WINDOW_LABEL[since]} – CheckMyGit`);
+	const description = $derived(
+		`The 25 fastest-growing ${langPrefix}repositories on GitHub ${WINDOW_PERIOD_TEXT[since]}. Updated regularly.`
+	);
+	const h1Title = $derived(`Trending ${langPrefix}Repos ${WINDOW_LABEL[since]}`);
+
+	const canonicalUrl = $derived.by(() => {
+		const u = new URL(`${SITE_URL}/trending`);
+		if (since !== DEFAULT_TRENDING_WINDOW) u.searchParams.set('since', since);
+		if (language) u.searchParams.set('language', language);
+		return u.toString();
+	});
+
+	const jsonLdScript = $derived.by(() => {
+		if (!repos.success || repos.data.length === 0) return '';
+		const json = JSON.stringify({
+			'@context': 'https://schema.org',
+			'@type': 'ItemList',
+			name: h1Title,
+			description,
+			numberOfItems: repos.data.length,
+			itemListElement: repos.data.map((r) => ({
+				'@type': 'ListItem',
+				position: r.rank,
+				item: {
+					'@type': 'SoftwareSourceCode',
+					name: r.nameWithOwner,
+					url: r.url,
+					codeRepository: r.url,
+					programmingLanguage: r.language?.name,
+					description: r.description ?? undefined
+				}
+			}))
+		}).replace(/</g, '\\u003c');
+		return `<script type="application/ld+json">${json}</` + `script>`;
+	});
+</script>
+
+<svelte:head>
+	<title>{titleBase}</title>
+	<meta name="description" content={description} />
+	<link rel="canonical" href={canonicalUrl} />
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content={titleBase} />
+	<meta property="og:description" content={description} />
+	<meta property="og:url" content={canonicalUrl} />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content={titleBase} />
+	<meta name="twitter:description" content={description} />
+	{#if jsonLdScript}
+		<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+		{@html jsonLdScript}
+	{/if}
+</svelte:head>
+
+<Header />
+
+<main class="relative min-h-screen w-full overflow-x-hidden">
+	<div class="saas-glow"></div>
+	<div class="grid-bg absolute inset-0 z-0"></div>
+
+	<div class="relative z-10 mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+		<!-- Header section -->
+		<div class="mb-8 text-center">
+			<h1
+				class="mb-3 inline-flex items-center gap-2.5 text-3xl font-bold text-text-primary sm:text-4xl"
+			>
+				<FireIcon size={36} />
+				Trending
+				{#if language}
+					<span class="text-text-secondary">{language}</span>
+				{/if}
+			</h1>
+			<p class="text-lg text-text-secondary">
+				The hottest repositories on GitHub right now — updated regularly.
+			</p>
+		</div>
+
+		<!-- Window tabs -->
+		<div class="mb-6 flex justify-center">
+			<SegmentedTabs
+				items={windowItems}
+				value={since}
+				onchange={switchWindow}
+				ariaLabel="Time window"
+			>
+				{#snippet icon({ active })}
+					{#if active}<FireIcon size={14} />{/if}
+				{/snippet}
+			</SegmentedTabs>
+		</div>
+
+		<!-- Language filter -->
+		<div class="mb-6 flex flex-wrap items-center justify-center gap-4">
+			<TrendingFilters {language} onchange={changeLanguage} />
+		</div>
+
+		<!-- Content -->
+		<Card variant="default" padding="none">
+			{#if loading}
+				<TrendingTableSkeleton />
+			{:else if !repos.success}
+				<div class="p-8 text-center">
+					<svg
+						class="mx-auto mb-4 h-12 w-12 text-accent-red"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+						/>
+					</svg>
+					<p class="text-text-secondary">
+						{repos.error || 'Failed to load trending repositories'}
+					</p>
+				</div>
+			{:else if repos.data.length === 0}
+				<div class="p-8 text-center">
+					<p class="text-text-secondary">No trending repositories found.</p>
+				</div>
+			{:else}
+				<TrendingTable repos={repos.data} {since} />
+			{/if}
+		</Card>
+
+		<p class="mt-6 text-center text-sm text-text-tertiary">
+			Click any row to view the developer's CheckMyGit portfolio.
+		</p>
+	</div>
+</main>
+
+<Footer />
