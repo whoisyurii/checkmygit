@@ -19,21 +19,37 @@
 	} from '$lib/types/trending';
 
 	const windowItems = TRENDING_WINDOWS.map((w) => ({ value: w, label: WINDOW_LABEL[w] }));
+	// Empty result used while a streamed SSR promise or a client filter-switch
+	// fetch is in flight. `loading` gates rendering, so callers never see this
+	// as a real result — `source` is just a stable placeholder.
+	const PENDING_REPOS: TrendingResult = { success: true, data: [], source: 'fallback' };
+	const FAILED_REPOS: TrendingResult = {
+		success: false,
+		data: [],
+		source: 'fallback',
+		error: 'Failed to load'
+	};
 
 	let { data } = $props();
 
-	// Local state seeded from server load. Tab/filter changes use pushState (no full
-	// reload), so subsequent UI must drive off these refs rather than `data`. The $effect
-	// below re-syncs when the loader actually re-runs (e.g. external nav to /trending).
+	// `data.repos` is `TrendingResult` on cache hit (full HTML in initial response)
+	// or `Promise<TrendingResult>` on cache miss (streamed). Initialize repos/loading
+	// to match so the SSR HTML reflects the cache state.
 	/* svelte-ignore state_referenced_locally */
 	let since = $state<TrendingWindow>(data.since);
 	/* svelte-ignore state_referenced_locally */
 	let language = $state<string>(data.language);
 	/* svelte-ignore state_referenced_locally */
-	let repos = $state<TrendingResult>(data.repos);
-	let loading = $state(false);
+	let repos = $state<TrendingResult>(
+		data.repos instanceof Promise ? PENDING_REPOS : data.repos
+	);
+	/* svelte-ignore state_referenced_locally */
+	let loading = $state<boolean>(data.repos instanceof Promise);
 
 	let inFlightFetch: AbortController | null = null;
+	// Token to ignore stale streamed-promise resolutions if the loader re-runs
+	// (or a client filter switch fires) before the original promise settles.
+	let streamToken = 0;
 
 	// Re-sync when the load function actually re-runs (e.g. arriving via a header link
 	// to /trending with different params). pushState-driven changes don't fire this.
@@ -45,8 +61,28 @@
 		}
 		since = data.since;
 		language = data.language;
-		repos = data.repos;
-		loading = false;
+
+		const incoming = data.repos;
+		if (incoming instanceof Promise) {
+			loading = true;
+			repos = PENDING_REPOS;
+			const token = ++streamToken;
+			incoming
+				.then((result) => {
+					if (token !== streamToken) return;
+					repos = result;
+					loading = false;
+				})
+				.catch(() => {
+					if (token !== streamToken) return;
+					repos = FAILED_REPOS;
+					loading = false;
+				});
+		} else {
+			streamToken++;
+			repos = incoming;
+			loading = false;
+		}
 	});
 
 	$effect(() => {
@@ -65,6 +101,9 @@
 
 	async function fetchData() {
 		inFlightFetch?.abort();
+		// Invalidate any pending streamed SSR promise so its late resolution
+		// can't clobber the response we're about to fetch here.
+		streamToken++;
 		const controller = new AbortController();
 		inFlightFetch = controller;
 		loading = true;
@@ -80,7 +119,7 @@
 		} catch (err) {
 			if (err instanceof DOMException && err.name === 'AbortError') return;
 			if (inFlightFetch === controller) {
-				repos = { success: false, data: [], source: 'fallback', error: 'Failed to load' };
+				repos = FAILED_REPOS;
 			}
 		} finally {
 			if (inFlightFetch === controller) {
