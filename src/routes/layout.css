@@ -118,10 +118,15 @@ html {
 	font-family: var(--font-sans);
 	background-color: var(--color-bg-primary);
 	color: var(--color-text-primary);
+	color-scheme: dark;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	scroll-behavior: smooth;
 	transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+:root.light {
+	color-scheme: light;
 }
 
 body {

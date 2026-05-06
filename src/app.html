@@ -3,6 +3,25 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="theme-color" content="#030303" />
+		<script>
+			(function () {
+				try {
+					var stored = localStorage.getItem('theme');
+					var theme =
+						stored === 'dark' || stored === 'light'
+							? stored
+							: window.matchMedia('(prefers-color-scheme: dark)').matches
+								? 'dark'
+								: 'light';
+					if (theme === 'light') document.documentElement.classList.add('light');
+					document.documentElement.setAttribute('data-theme', theme);
+					var meta = document.querySelector('meta[name="theme-color"]');
+					if (meta) meta.setAttribute('content', theme === 'dark' ? '#030303' : '#FFFFFF');
+					window.__INITIAL_THEME__ = theme;
+				} catch (e) {}
+			})();
+		</script>
 		<link rel="preconnect" href="https://avatars.githubusercontent.com" crossorigin />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link rel="dns-prefetch" href="https://api.github.com" />
