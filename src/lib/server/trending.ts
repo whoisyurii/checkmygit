@@ -12,7 +12,11 @@ const TTL_BY_WINDOW: Record<TrendingWindow, { fresh: number; swr: number }> = {
 
 function buildCacheKey(since: TrendingWindow, language: string | undefined): string {
 	const lang = language ? language.toLowerCase() : 'all';
-	return `https://kv-cache/_/trending/${since}/${lang}`;
+	// Daily window keys include the UTC date so the 6h SWR window can't carry
+	// yesterday's "today" snapshot past midnight. Weekly/monthly rotate slowly
+	// enough that their TTLs alone are sufficient.
+	const dateSuffix = since === 'daily' ? `/${new Date().toISOString().slice(0, 10)}` : '';
+	return `https://kv-cache/_/trending/${since}/${lang}${dateSuffix}`;
 }
 
 function buildTrendingUrl(since: TrendingWindow, language: string | undefined): string {
@@ -117,7 +121,25 @@ interface FetchTrendingOptions {
 	waitUntil?: (p: Promise<unknown>) => void;
 }
 
-export async function fetchTrending({
+// Cache-only lookup. Returns null on miss so callers can decide whether to
+// block-and-fetch (api route) or stream a skeleton (page loader).
+export async function tryCachedTrending(options: {
+	since: TrendingWindow;
+	language?: string;
+	caches?: CacheStorage & { default: Cache };
+}): Promise<TrendingResult | null> {
+	if (!options.caches) return null;
+	const cacheKey = buildCacheKey(options.since, options.language);
+	const cached = await options.caches.default.match(new Request(cacheKey));
+	if (!cached) return null;
+	const data = (await cached.json()) as TrendingRepository[];
+	return { success: true, data, source: 'cache' };
+}
+
+// Slow path: scrape live, fall back to GraphQL on parse failure, write cache.
+// Always one upstream round-trip — callers should check the cache first if they
+// want to avoid it.
+export async function fetchTrendingLive({
 	since,
 	language,
 	caches,
@@ -125,14 +147,6 @@ export async function fetchTrending({
 }: FetchTrendingOptions): Promise<TrendingResult> {
 	const cacheKey = buildCacheKey(since, language);
 	const ttl = TTL_BY_WINDOW[since];
-
-	if (caches) {
-		const cached = await caches.default.match(new Request(cacheKey));
-		if (cached) {
-			const data = (await cached.json()) as TrendingRepository[];
-			return { success: true, data, source: 'cache' };
-		}
-	}
 
 	try {
 		const data = await fetchAndParse(since, language);
@@ -195,4 +209,12 @@ export async function fetchTrending({
 			error: error instanceof Error ? error.message : 'Unknown error'
 		};
 	}
+}
+
+// Convenience: cache-or-live in one call. Use this when the caller always
+// blocks on a result (e.g. the JSON API endpoint).
+export async function fetchTrending(options: FetchTrendingOptions): Promise<TrendingResult> {
+	const cached = await tryCachedTrending(options);
+	if (cached) return cached;
+	return fetchTrendingLive(options);
 }
