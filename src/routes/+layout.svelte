@@ -26,7 +26,6 @@
 </script>
 
 <svelte:head>
-	<meta name="theme-color" content={themeState.isDark ? '#030303' : '#FFFFFF'} />
 	<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 	{#if !pageOwnsCanonical}
 		<link rel="canonical" href="{SITE_URL}{$page.url.pathname}" />

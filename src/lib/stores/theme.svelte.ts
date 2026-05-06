@@ -1,41 +1,52 @@
 // Theme state management using Svelte 5 runes
-// Supports localStorage persistence and system preference detection
+// Initial theme is resolved by the inline pre-hydration script in app.html
+// (sets `.light` class on <html>, `data-theme` attr, and window.__INITIAL_THEME__).
+// This store reads that pre-resolved value to stay in sync, and handles
+// toggle/system-change updates after hydration.
 
 export type Theme = 'dark' | 'light';
 
 const STORAGE_KEY = 'theme';
+const META_DARK = '#030303';
+const META_LIGHT = '#FFFFFF';
+
+declare global {
+	interface Window {
+		__INITIAL_THEME__?: Theme;
+	}
+}
 
 class ThemeState {
 	current = $state<Theme>('dark');
 	#initialized = false;
 
-	constructor() {
-		// Initialization happens in init() to avoid SSR issues
-	}
-
 	init() {
 		if (this.#initialized || typeof window === 'undefined') return;
 		this.#initialized = true;
 
-		// Check localStorage first
-		const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
-		if (stored === 'dark' || stored === 'light') {
-			this.current = stored;
+		// Trust the pre-hydration script's resolved value if present
+		const preResolved = window.__INITIAL_THEME__;
+		if (preResolved === 'dark' || preResolved === 'light') {
+			this.current = preResolved;
 		} else {
-			// Fall back to system preference
-			const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-			this.current = prefersDark ? 'dark' : 'light';
+			const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
+			if (stored === 'dark' || stored === 'light') {
+				this.current = stored;
+			} else {
+				this.current = window.matchMedia('(prefers-color-scheme: dark)').matches
+					? 'dark'
+					: 'light';
+			}
+			this.#applyTheme();
 		}
 
-		// Listen for system preference changes (only if no stored preference)
+		// Live-follow system pref only when user has not manually chosen
 		window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
 			if (!localStorage.getItem(STORAGE_KEY)) {
 				this.current = e.matches ? 'dark' : 'light';
 				this.#applyTheme();
 			}
 		});
-
-		this.#applyTheme();
 	}
 
 	toggle() {
@@ -59,6 +70,10 @@ class ThemeState {
 		} else {
 			root.classList.remove('light');
 		}
+		root.setAttribute('data-theme', this.current);
+
+		const meta = document.querySelector('meta[name="theme-color"]');
+		if (meta) meta.setAttribute('content', this.current === 'dark' ? META_DARK : META_LIGHT);
 	}
 
 	get isDark() {
