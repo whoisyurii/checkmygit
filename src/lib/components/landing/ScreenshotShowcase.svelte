@@ -8,12 +8,12 @@
 
 	const screenshotImg = $derived(themeState.isLight ? screenshotLight : screenshotDark);
 
-	// Calculate rotation based on scroll position relative to section
-	let rotateX = $derived.by(() => {
+	// Scroll progress through the section: 0 before it enters view, 1 once it's settled
+	let progress = $derived.by(() => {
 		// Reference scrollY to ensure this re-runs on scroll
 		const _ = scrollY;
 
-		if (!sectionEl || typeof window === 'undefined') return 20;
+		if (!sectionEl || typeof window === 'undefined') return 0;
 
 		const rect = sectionEl.getBoundingClientRect();
 		const viewportHeight = window.innerHeight;
@@ -23,10 +23,12 @@
 		const startPoint = viewportHeight; // When top of section hits bottom of viewport
 		const endPoint = viewportHeight * 0.3; // When top of section is 30% from top
 
-		const progress = Math.min(Math.max((startPoint - rect.top) / (startPoint - endPoint), 0), 1);
-
-		return 20 * (1 - progress); // 20deg → 0deg
+		return Math.min(Math.max((startPoint - rect.top) / (startPoint - endPoint), 0), 1);
 	});
+
+	// As you scroll in, the card flattens and grows from 33% smaller to full size
+	const rotateX = $derived(20 * (1 - progress)); // 20deg → 0deg
+	const scale = $derived(0.67 + 0.33 * progress); // 0.67 → 1 (33% smaller → real size)
 </script>
 
 <svelte:window bind:scrollY />
@@ -38,7 +40,7 @@
 	<div class="mx-auto max-w-6xl" style="perspective: 1200px;">
 		<div
 			class="relative"
-			style="transform: rotateX({rotateX}deg); transform-origin: center bottom; will-change: transform;"
+			style="transform: rotateX({rotateX}deg) scale({scale}); transform-origin: center bottom; will-change: transform;"
 		>
 			<!-- Subtle green glow at bottom -->
 			<div class="absolute -bottom-6 inset-x-16 h-20 bg-saas-green blur-3xl opacity-70"></div>
