@@ -11,6 +11,13 @@ export const STALE_CACHE_MAX_AGE_MS = 60 * 60 * 1000; // 1 hour - max age for st
 // KV keys
 export const GLOBAL_VIEW_KEY = 'global:total_portfolios';
 
+// Global counter write-coalescing: the global key is touched by every counted
+// view, so we buffer increments in the edge cache and flush to KV at most once
+// per interval. This stops one hot key from draining the daily write quota; a
+// vanity total tolerates the resulting sub-minute lag.
+export const GLOBAL_FLUSH_INTERVAL_MS = 60 * 1000; // 1 minute
+export const GLOBAL_BUFFER_CACHE_KEY = 'https://kv-cache/_/global-view-buffer';
+
 // Retry configuration for KV operations (handles transient errors)
 export const DEFAULT_KV_RETRY_OPTIONS = {
 	maxRetries: 1,

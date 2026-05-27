@@ -17,14 +17,6 @@ export interface ViewCountResult {
 	source: 'cache' | 'kv' | 'fallback';
 }
 
-/** Result from handling a profile view */
-export interface ProfileViewResult {
-	views: number;
-	globalViews: number;
-	isStale: boolean;
-	source: 'cache' | 'kv' | 'fallback';
-}
-
 /** Options for KV read operations with retry */
 export interface KVRetryOptions {
 	maxRetries: number;

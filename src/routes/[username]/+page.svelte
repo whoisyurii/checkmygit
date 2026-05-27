@@ -29,16 +29,44 @@
 	let profile = $state<GitHubProfile | null>(null);
 	let views = $state<number>(0);
 
+	// Which username we've already sent a view beacon for. Plain (non-reactive)
+	// variable so client-side navigation between profiles counts each one once.
+	let countedUser = '';
+
+	// Fire-and-forget view beacon. Running this client-side means crawlers (which
+	// don't execute JS) never hit the KV write path. Best-effort: must never throw
+	// or affect the UI.
+	function sendViewBeacon(username: string) {
+		try {
+			void fetch('/api/view', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ username }),
+				keepalive: true
+			}).catch(() => {});
+		} catch {
+			// ignore
+		}
+	}
+
 	// Resolve the streamed promises
 	$effect(() => {
 		isLoading = true;
 		loadError = null;
+		const requestedUser = data.username;
 
 		Promise.all([data.profile, data.views])
 			.then(([resolvedProfile, resolvedViews]) => {
 				profile = resolvedProfile;
 				views = resolvedViews;
 				isLoading = false;
+
+				// Count the view only after the profile actually resolves (so 404s
+				// aren't counted) and only once per profile.
+				if (countedUser !== requestedUser) {
+					countedUser = requestedUser;
+					sendViewBeacon(requestedUser);
+				}
 			})
 			.catch((err) => {
 				loadError = err;

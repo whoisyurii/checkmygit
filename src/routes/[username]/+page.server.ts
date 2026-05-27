@@ -1,8 +1,8 @@
 import type { PageServerLoad } from './$types';
 import { fetchGitHubProfile } from '$lib/server/github';
-import { handleProfileView } from '$lib/server/kv';
+import { getProfileViews } from '$lib/server/kv';
 
-export const load: PageServerLoad = async ({ params, platform, cookies, getClientAddress }) => {
+export const load: PageServerLoad = async ({ params, platform, cookies }) => {
 	const { username } = params;
 
 	// Return username immediately for optimistic UI
@@ -21,18 +21,14 @@ export const load: PageServerLoad = async ({ params, platform, cookies, getClien
 		return result.data;
 	});
 
-	// Stream view count as well (with fallback to 0 on error)
-	const viewsPromise = handleProfileView({
+	// Read-only: render the current count (with an optimistic +1 for new
+	// visitors). The actual increment is persisted by the /api/view beacon, which
+	// only fires in real browsers — keeping crawlers off the KV write path.
+	const viewsPromise = getProfileViews({
 		platform,
 		username,
-		cookies: {
-			get: (name) => cookies.get(name),
-			set: (name, value, opts) => cookies.set(name, value, opts)
-		},
-		ip: getClientAddress()
-	})
-		.then((result) => result.views)
-		.catch(() => 0);
+		cookies: { get: (name) => cookies.get(name) }
+	}).catch(() => 0);
 
 	return {
 		username,
