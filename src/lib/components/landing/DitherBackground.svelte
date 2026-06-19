@@ -85,18 +85,18 @@ void main() {
 	float lit = step(th, field * 1.25);
 	float dots = lit * dotMask * (0.40 + 0.60 * field);
 	float core = smoothstep(0.72, 1.0, field);
-	float lum = max(dots * 1.0, core * 0.62);
+	float lum = max(dots * 0.92, core * 0.56);
 
 	vec3 col;
 	if (u_dark > 0.5) {
 		// teal highlights melting into cool gray, on near-black
-		vec3 colA = vec3(0.18, 0.21, 0.21);
-		vec3 colB = vec3(0.16, 0.78, 0.69);
-		col = vec3(0.012, 0.012, 0.015) + mix(colA, colB, lum) * lum * 0.92;
+		vec3 colA = vec3(0.17, 0.20, 0.20);
+		vec3 colB = vec3(0.16, 0.72, 0.63);
+		col = vec3(0.012, 0.012, 0.015) + mix(colA, colB, lum) * lum * 0.74;
 	} else {
 		// same field as teal/gray specks darkening the white hero
-		vec3 dotCol = mix(vec3(0.70, 0.74, 0.74), vec3(0.05, 0.60, 0.52), lum);
-		col = mix(vec3(1.0), dotCol, lum * 0.64);
+		vec3 dotCol = mix(vec3(0.74, 0.77, 0.77), vec3(0.05, 0.61, 0.53), lum);
+		col = mix(vec3(1.0), dotCol, lum * 0.55);
 	}
 	gl_FragColor = vec4(col, 1.0);
 }`;
