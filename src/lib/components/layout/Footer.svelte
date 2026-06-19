@@ -25,6 +25,12 @@
 				>
 					About
 				</a>
+				<a
+					href={resolve('/globe')}
+					class="text-sm text-text-secondary transition-colors hover:text-text-primary"
+				>
+					Globe
+				</a>
 				<!-- <a
 					href={REPO_URL}
 					target="_blank"
