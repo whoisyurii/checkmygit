@@ -53,7 +53,7 @@
 			</div>
 		{/if}
 
-		<h1 class="mb-6 font-display text-4xl font-bold tracking-tight md:text-7xl">
+		<h1 class="mb-6 text-4xl font-bold tracking-tight md:text-7xl">
 			Transform your GitHub
 			<br />
 			<span class="text-gradient">into a portfolio</span>

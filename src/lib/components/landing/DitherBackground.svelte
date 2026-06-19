@@ -1,7 +1,15 @@
 <script lang="ts">
-	// Fullscreen Bayer-dithered flow field in raw WebGL — no dependencies.
-	// Teal-lit dots fade to cool gray over the void; slow domain-warped fbm flow.
+	import { themeState } from '$lib/stores/theme.svelte';
+
+	// Bayer-dithered flow field in raw WebGL — teal-lit dots melting into cool
+	// gray, slow domain-warped fbm flow. No dependencies beyond the theme store.
 	let canvas: HTMLCanvasElement | undefined = $state();
+
+	// Shared with the theme effect below so it can repaint on light/dark toggle
+	// without tearing down the GL context.
+	let gl: WebGLRenderingContext | null = null;
+	let uDark: WebGLUniformLocation | null = null;
+	let redrawStatic: (() => void) | null = null;
 
 	const VERT = `
 attribute vec2 a_pos;
@@ -94,54 +102,54 @@ void main() {
 }`;
 
 	$effect(() => {
-		if (!canvas) return;
-		const gl = canvas.getContext('webgl', {
+		const el = canvas;
+		if (!el) return;
+		const context = el.getContext('webgl', {
 			antialias: false,
 			depth: false,
 			stencil: false,
 			alpha: false,
 			powerPreference: 'low-power'
 		});
-		if (!gl) return;
+		if (!context) return;
+		gl = context;
 
 		const compile = (type: number, src: string) => {
-			const s = gl.createShader(type)!;
-			gl.shaderSource(s, src);
-			gl.compileShader(s);
-			if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-				console.error('shader compile failed:', gl.getShaderInfoLog(s));
+			const s = context.createShader(type)!;
+			context.shaderSource(s, src);
+			context.compileShader(s);
+			if (!context.getShaderParameter(s, context.COMPILE_STATUS)) {
+				console.error('shader compile failed:', context.getShaderInfoLog(s));
 			}
 			return s;
 		};
 
-		const prog = gl.createProgram()!;
-		gl.attachShader(prog, compile(gl.VERTEX_SHADER, VERT));
-		gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FRAG));
-		gl.linkProgram(prog);
-		gl.useProgram(prog);
+		const prog = context.createProgram()!;
+		context.attachShader(prog, compile(context.VERTEX_SHADER, VERT));
+		context.attachShader(prog, compile(context.FRAGMENT_SHADER, FRAG));
+		context.linkProgram(prog);
+		context.useProgram(prog);
 
 		// fullscreen triangle
-		const buf = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-		const aPos = gl.getAttribLocation(prog, 'a_pos');
-		gl.enableVertexAttribArray(aPos);
-		gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+		const buf = context.createBuffer();
+		context.bindBuffer(context.ARRAY_BUFFER, buf);
+		context.bufferData(
+			context.ARRAY_BUFFER,
+			new Float32Array([-1, -1, 3, -1, -1, 3]),
+			context.STATIC_DRAW
+		);
+		const aPos = context.getAttribLocation(prog, 'a_pos');
+		context.enableVertexAttribArray(aPos);
+		context.vertexAttribPointer(aPos, 2, context.FLOAT, false, 0, 0);
 
-		const uRes = gl.getUniformLocation(prog, 'u_res');
-		const uTime = gl.getUniformLocation(prog, 'u_time');
-		const uPx = gl.getUniformLocation(prog, 'u_px');
-		const uSeed = gl.getUniformLocation(prog, 'u_seed');
-		const uDark = gl.getUniformLocation(prog, 'u_dark');
-		gl.uniform1f(uSeed, Math.random());
+		const uRes = context.getUniformLocation(prog, 'u_res');
+		const uTime = context.getUniformLocation(prog, 'u_time');
+		const uPx = context.getUniformLocation(prog, 'u_px');
+		const uSeed = context.getUniformLocation(prog, 'u_seed');
+		uDark = context.getUniformLocation(prog, 'u_dark');
+		context.uniform1f(uSeed, Math.random());
 
-		// Follow the app's light/dark class so the field matches the page background
-		const readDark = () => !document.documentElement.classList.contains('light');
-		gl.uniform1f(uDark, readDark() ? 1 : 0);
-
-		const el = canvas;
 		const dpr = Math.min(window.devicePixelRatio || 1, 2);
-
 		const resize = () => {
 			const w = Math.round(el.clientWidth * dpr);
 			const h = Math.round(el.clientHeight * dpr);
@@ -149,10 +157,10 @@ void main() {
 			if (el.width !== w || el.height !== h) {
 				el.width = w;
 				el.height = h;
-				gl.viewport(0, 0, w, h);
+				context.viewport(0, 0, w, h);
 			}
-			gl.uniform2f(uRes, el.width, el.height);
-			gl.uniform1f(uPx, Math.max(3, Math.round(5 * dpr)));
+			context.uniform2f(uRes, el.width, el.height);
+			context.uniform1f(uPx, Math.max(3, Math.round(5 * dpr)));
 		};
 		resize();
 		const ro = new ResizeObserver(resize);
@@ -161,46 +169,68 @@ void main() {
 		const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		const start = performance.now();
 		let raf = 0;
-		let running = true;
+		let tabVisible = document.visibilityState === 'visible';
+		let onScreen = true;
 
 		const frame = () => {
-			gl.uniform1f(uTime, (performance.now() - start) / 1000);
-			gl.drawArrays(gl.TRIANGLES, 0, 3);
-			if (running && !reducedMotion) raf = requestAnimationFrame(frame);
+			context.uniform1f(uTime, (performance.now() - start) / 1000);
+			context.drawArrays(context.TRIANGLES, 0, 3);
+			raf = requestAnimationFrame(frame);
+		};
+
+		// Run the loop only while the hero is both on-screen and in a visible tab.
+		const sync = () => {
+			const run = tabVisible && onScreen && !reducedMotion;
+			if (run && !raf) raf = requestAnimationFrame(frame);
+			else if (!run && raf) {
+				cancelAnimationFrame(raf);
+				raf = 0;
+			}
 		};
 
 		const onVisibility = () => {
-			running = document.visibilityState === 'visible';
-			if (running && !reducedMotion) {
-				cancelAnimationFrame(raf);
-				raf = requestAnimationFrame(frame);
-			}
+			tabVisible = document.visibilityState === 'visible';
+			sync();
 		};
 		document.addEventListener('visibilitychange', onVisibility);
 
+		const io = new IntersectionObserver((entries) => {
+			onScreen = entries[0].isIntersecting;
+			sync();
+		});
+		io.observe(el);
+
 		if (reducedMotion) {
-			// static frame, but at an interesting point in the flow
-			gl.uniform1f(uTime, 40);
-			gl.drawArrays(gl.TRIANGLES, 0, 3);
+			// Hold a single representative frame; the theme effect paints it once
+			// u_dark is set, and repaints it on toggle.
+			redrawStatic = () => {
+				context.uniform1f(uTime, 40);
+				context.drawArrays(context.TRIANGLES, 0, 3);
+			};
 		} else {
-			raf = requestAnimationFrame(frame);
+			sync();
 		}
 
-		// Repaint the field when the theme toggles (live, no re-init)
-		const themeObs = new MutationObserver(() => {
-			gl.uniform1f(uDark, readDark() ? 1 : 0);
-			if (reducedMotion) gl.drawArrays(gl.TRIANGLES, 0, 3);
-		});
-		themeObs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-
 		return () => {
-			running = false;
-			cancelAnimationFrame(raf);
+			if (raf) cancelAnimationFrame(raf);
 			ro.disconnect();
-			themeObs.disconnect();
+			io.disconnect();
 			document.removeEventListener('visibilitychange', onVisibility);
-			gl.getExtension('WEBGL_lose_context')?.loseContext();
+			context.getExtension('WEBGL_lose_context')?.loseContext();
+			gl = null;
+			uDark = null;
+			redrawStatic = null;
 		};
+	});
+
+	// Drive the light/dark uniform from the shared theme store — one reactive
+	// line instead of a parallel DOM observer.
+	$effect(() => {
+		const dark = themeState.isDark;
+		if (gl && uDark) {
+			gl.uniform1f(uDark, dark ? 1 : 0);
+			redrawStatic?.();
+		}
 	});
 </script>
 

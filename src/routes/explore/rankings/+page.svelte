@@ -227,9 +227,7 @@
 <div class="mx-auto max-w-6xl px-4 pt-6 pb-12 sm:px-6 lg:px-8">
 	<!-- Header Section -->
 	<div class="mb-8 text-center">
-		<h1 class="mb-3 font-display text-3xl font-bold text-text-primary sm:text-4xl">
-			GitHub Rankings
-		</h1>
+		<h1 class="mb-3 text-3xl font-bold text-text-primary sm:text-4xl">GitHub Rankings</h1>
 		<p class="text-lg text-text-secondary">
 			Discover the most starred repositories and influential developers
 		</p>

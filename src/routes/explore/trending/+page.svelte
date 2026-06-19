@@ -206,7 +206,7 @@
 	<!-- Header section -->
 	<div class="mb-8 text-center">
 		<h1
-			class="mb-3 inline-flex items-center justify-center gap-2.5 font-display text-3xl font-bold text-text-primary sm:text-4xl"
+			class="mb-3 inline-flex items-center justify-center gap-2.5 text-3xl font-bold text-text-primary sm:text-4xl"
 		>
 			<TrendIcon size={32} class="text-accent" />
 			Trending

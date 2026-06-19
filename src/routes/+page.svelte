@@ -43,12 +43,16 @@
 <Header />
 
 <main class="relative min-h-screen w-full overflow-hidden">
-	<!-- Floating dithered flow field behind the hero, fading out before the showcase -->
-	<div
-		class="pointer-events-none absolute inset-x-0 top-0 z-0 h-[820px]"
-		style="-webkit-mask-image: linear-gradient(to bottom, black 55%, transparent); mask-image: linear-gradient(to bottom, black 55%, transparent);"
-	>
-		<DitherBackground />
+	<!-- Floating dithered field behind the hero, with a scrim that keeps the copy
+	     readable; the whole backdrop region fades out before the showcase. -->
+	<div class="pointer-events-none absolute inset-x-0 top-0 z-0 h-[820px]">
+		<div
+			class="absolute inset-0"
+			style="-webkit-mask-image: linear-gradient(to bottom, black 55%, transparent); mask-image: linear-gradient(to bottom, black 55%, transparent);"
+		>
+			<DitherBackground />
+		</div>
+		<div class="hero-scrim absolute inset-0"></div>
 	</div>
 
 	<Hero totalPortfolios={data.totalPortfolios} />

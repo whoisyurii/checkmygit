@@ -15,7 +15,7 @@
 
 <div class="mx-auto max-w-5xl px-4 pt-6 pb-12 sm:px-6 lg:px-8">
 	<header class="mb-8 text-center">
-		<h1 class="font-display text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
+		<h1 class="text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
 			Developers Around the Globe
 		</h1>
 		<p class="mx-auto mt-3 max-w-[42rem] text-text-secondary">

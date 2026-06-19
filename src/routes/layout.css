@@ -1,6 +1,5 @@
 /* Fonts - must be at top */
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap');
 
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
@@ -71,8 +70,7 @@
 	--font-sans:
 		'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial,
 		sans-serif;
-	--font-mono: 'Geist Mono', 'SF Mono', 'Roboto Mono', Menlo, monospace;
-	--font-display: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+	--font-mono: 'SF Mono', 'Roboto Mono', Menlo, monospace;
 }
 
 /* Light Theme Override */
@@ -259,6 +257,17 @@ a {
 	-webkit-background-clip: text;
 	background-clip: text;
 	color: transparent;
+}
+
+/* Dims the dithered field behind the hero copy so text stays readable.
+   color-mix keeps it tied to the page background, so it works in both themes. */
+.hero-scrim {
+	background: radial-gradient(
+		58% 48% at 50% 38%,
+		color-mix(in srgb, var(--color-bg-primary) 90%, transparent) 0%,
+		color-mix(in srgb, var(--color-bg-primary) 55%, transparent) 42%,
+		transparent 70%
+	);
 }
 
 .grid-bg {
