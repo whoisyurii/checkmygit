@@ -41,6 +41,7 @@
 	},
 	"dependencies": {
 		"@sveltejs/adapter-cloudflare": "^7.2.4",
+		"cobe": "^2.0.1",
 		"html-to-image": "^1.11.13",
 		"qrcode": "^1.5.4",
 		"svelte-ionicons": "^3.0.1"
