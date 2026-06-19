@@ -125,7 +125,7 @@
 						: `https://${profile.user.websiteUrl}`}
 					target="_blank"
 					rel="noopener noreferrer"
-					class="text-accent-green hover:underline"
+					class="text-accent hover:underline"
 				>
 					{profile.user.websiteUrl.replace(/^https?:\/\//, '')}
 				</a>
@@ -143,7 +143,7 @@
 					href="https://twitter.com/{profile.user.twitterUsername}"
 					target="_blank"
 					rel="noopener noreferrer"
-					class="text-accent-green hover:underline"
+					class="text-accent hover:underline"
 				>
 					@{profile.user.twitterUsername}
 				</a>
@@ -167,7 +167,7 @@
 	<div class="flex items-center justify-center lg:justify-start gap-4 text-sm">
 		<a
 			href="https://github.com/{profile.user.login}?tab=followers"
-			class="flex items-center gap-2 text-text-secondary hover:text-accent-green"
+			class="flex items-center gap-2 text-text-secondary hover:text-accent"
 		>
 			<svg class="h-4 w-4" fill="currentColor" viewBox="0 0 16 16">
 				<path
@@ -179,7 +179,7 @@
 		<span class="text-text-tertiary">·</span>
 		<a
 			href="https://github.com/{profile.user.login}?tab=following"
-			class="flex items-center gap-2 text-text-secondary hover:text-accent-green"
+			class="flex items-center gap-2 text-text-secondary hover:text-accent"
 		>
 			<span><span class="font-semibold text-text-primary">{profile.stats.following}</span> following</span>
 		</a>

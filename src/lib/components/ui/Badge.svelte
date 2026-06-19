@@ -41,7 +41,7 @@
 		{@render children()}
 	</span>
 {:else}
-	<span class="{baseClasses} bg-accent-green text-white {className}" {style}>
+	<span class="{baseClasses} bg-accent text-white {className}" {style}>
 		{@render children()}
 	</span>
 {/if}

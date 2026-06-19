@@ -27,7 +27,9 @@
 </script>
 
 <header class="sticky top-0 z-50 w-full border-b border-border-default bg-bg-primary">
-	<div class="group mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+	<div
+		class="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8"
+	>
 		<Logo />
 
 		<!-- Center section with search or controls -->
@@ -38,13 +40,14 @@
 					<HeaderControls {template} {onTemplateChange} />
 				</div>
 			{:else}
-				<HeaderSearch {username} />
+				<!-- Search is desktop-only; mobile users use the on-page search/generate field -->
+				<div class="hidden w-full justify-center sm:flex">
+					<HeaderSearch {username} />
+				</div>
 			{/if}
 		</div>
 
-		<div
-			class="flex items-center overflow-hidden transition-[max-width,opacity] duration-300 ease-out max-sm:max-w-[500px] max-sm:opacity-100 max-sm:group-has-[input:focus]:pointer-events-none max-sm:group-has-[input:focus]:max-w-0 max-sm:group-has-[input:focus]:opacity-0"
-		>
+		<div class="flex items-center">
 			<HeaderActions {showControls} {onExport} {onShare} {onQRCode} />
 		</div>
 	</div>

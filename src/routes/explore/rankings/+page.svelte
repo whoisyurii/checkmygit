@@ -3,8 +3,6 @@
 	import { page } from '$app/stores';
 	import { SITE_URL } from '$lib/constants';
 	import { jsonLd } from '$lib/utils/jsonld';
-	import Header from '$lib/components/layout/Header.svelte';
-	import Footer from '$lib/components/layout/Footer.svelte';
 	import ReposTable from '$lib/components/rankings/ReposTable.svelte';
 	import UsersTable from '$lib/components/rankings/UsersTable.svelte';
 	import ReposTableSkeleton from '$lib/components/rankings/ReposTableSkeleton.svelte';
@@ -124,7 +122,7 @@
 			'@context': 'https://schema.org',
 			'@type': 'ItemList',
 			name: activeTab === 'users' ? 'Top GitHub Developers' : 'Top GitHub Repositories',
-			url: `${SITE_URL}/rankings?tab=${activeTab}`,
+			url: `${SITE_URL}/explore/rankings?tab=${activeTab}`,
 			numberOfItems: items.length,
 			itemListElement: items
 		};
@@ -226,96 +224,63 @@
 	{/if}
 </svelte:head>
 
-<Header />
+<div class="mx-auto max-w-6xl px-4 pt-6 pb-12 sm:px-6 lg:px-8">
+	<!-- Header Section -->
+	<div class="mb-8 text-center">
+		<h1 class="mb-3 font-display text-3xl font-bold text-text-primary sm:text-4xl">
+			GitHub Rankings
+		</h1>
+		<p class="text-lg text-text-secondary">
+			Discover the most starred repositories and influential developers
+		</p>
+	</div>
 
-<main class="relative min-h-screen w-full overflow-x-hidden">
-	<!-- Background effects -->
-	<div class="saas-glow"></div>
-	<div class="grid-bg absolute inset-0 z-0"></div>
-
-	<div class="relative z-10 mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
-		<!-- Header Section -->
-		<div class="mb-8 text-center">
-			<h1 class="mb-3 text-3xl font-bold text-text-primary sm:text-4xl">GitHub Rankings</h1>
-			<p class="text-lg text-text-secondary">
-				Discover the most starred repositories and influential developers
-			</p>
-		</div>
-
-		<!-- Tabs -->
-		<div class="mb-6 flex justify-center">
-			<SegmentedTabs items={tabs} value={activeTab} onchange={switchTab} ariaLabel="Rankings type">
-				{#snippet icon({ item })}
-					{#if item.value === 'repos'}
-						<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
-							/>
-						</svg>
-					{:else}
-						<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
-							/>
-						</svg>
-					{/if}
-				{/snippet}
-			</SegmentedTabs>
-		</div>
-
-		<!-- Filters -->
-		{#if activeTab === 'repos'}
-			<div class="mb-6 flex flex-wrap items-center justify-center gap-4">
-				<LanguageFilter language={data.language} />
-				<RepoTypeFilter value={repoType} onchange={changeRepoType} />
-			</div>
-		{:else}
-			<div class="mb-6 flex flex-wrap items-center justify-center gap-4">
-				<UserSortFilter sortBy={userSortBy} onchange={(v) => (userSortBy = v)} />
-				<RepoTypeFilter value={repoType} onchange={changeRepoType} />
-			</div>
-		{/if}
-
-		<!-- Content -->
-		<Card variant="default" padding="none">
-			{#if activeTab === 'repos'}
-				{#if reposResult === null}
-					<ReposTableSkeleton />
-				{:else if !reposResult.success}
-					<div class="p-8 text-center">
-						<svg
-							class="mx-auto mb-4 h-12 w-12 text-accent-red"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-							/>
-						</svg>
-						<p class="text-text-secondary">
-							{reposResult.error || 'Failed to load repositories'}
-						</p>
-					</div>
-				{:else if resolvedRepos.length === 0}
-					<div class="p-8 text-center">
-						<p class="text-text-secondary">No repositories found.</p>
-					</div>
+	<!-- Tabs -->
+	<div class="mb-6 flex justify-center">
+		<SegmentedTabs items={tabs} value={activeTab} onchange={switchTab} ariaLabel="Rankings type">
+			{#snippet icon({ item })}
+				{#if item.value === 'repos'}
+					<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
+						/>
+					</svg>
 				{:else}
-					<ReposTable repos={resolvedRepos} />
+					<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
+						/>
+					</svg>
 				{/if}
-			{:else if usersResult === null}
-				<UsersTableSkeleton />
-			{:else if !usersResult.success}
+			{/snippet}
+		</SegmentedTabs>
+	</div>
+
+	<!-- Filters -->
+	{#if activeTab === 'repos'}
+		<div class="mb-6 flex flex-wrap items-center justify-center gap-4">
+			<LanguageFilter language={data.language} />
+			<RepoTypeFilter value={repoType} onchange={changeRepoType} />
+		</div>
+	{:else}
+		<div class="mb-6 flex flex-wrap items-center justify-center gap-4">
+			<UserSortFilter sortBy={userSortBy} onchange={(v) => (userSortBy = v)} />
+			<RepoTypeFilter value={repoType} onchange={changeRepoType} />
+		</div>
+	{/if}
+
+	<!-- Content -->
+	<Card variant="default" padding="none">
+		{#if activeTab === 'repos'}
+			{#if reposResult === null}
+				<ReposTableSkeleton />
+			{:else if !reposResult.success}
 				<div class="p-8 text-center">
 					<svg
 						class="mx-auto mb-4 h-12 w-12 text-accent-red"
@@ -331,30 +296,55 @@
 						/>
 					</svg>
 					<p class="text-text-secondary">
-						{usersResult.error || 'Failed to load users'}
+						{reposResult.error || 'Failed to load repositories'}
 					</p>
 				</div>
-			{:else if sortedUsers.length === 0}
+			{:else if resolvedRepos.length === 0}
 				<div class="p-8 text-center">
-					<p class="text-text-secondary">No users found.</p>
+					<p class="text-text-secondary">No repositories found.</p>
 				</div>
 			{:else}
-				<UsersTable users={sortedUsers} {userSortBy} />
+				<ReposTable repos={resolvedRepos} />
 			{/if}
-		</Card>
-
-		<!-- Load More Button -->
-		{#if (activeTab === 'repos' && hasMoreRepos) || (activeTab === 'users' && hasMoreUsers)}
-			<div class="mt-6 flex justify-center">
-				<Button variant="secondary" onclick={loadMore} loading={loadingMore}>Load More</Button>
+		{:else if usersResult === null}
+			<UsersTableSkeleton />
+		{:else if !usersResult.success}
+			<div class="p-8 text-center">
+				<svg
+					class="mx-auto mb-4 h-12 w-12 text-accent-red"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+					/>
+				</svg>
+				<p class="text-text-secondary">
+					{usersResult.error || 'Failed to load users'}
+				</p>
 			</div>
+		{:else if sortedUsers.length === 0}
+			<div class="p-8 text-center">
+				<p class="text-text-secondary">No users found.</p>
+			</div>
+		{:else}
+			<UsersTable users={sortedUsers} {userSortBy} />
 		{/if}
+	</Card>
 
-		<!-- Info -->
-		<p class="mt-6 text-center text-sm text-text-tertiary">
-			Click on any row to view the developer's portfolio
-		</p>
-	</div>
-</main>
+	<!-- Load More Button -->
+	{#if (activeTab === 'repos' && hasMoreRepos) || (activeTab === 'users' && hasMoreUsers)}
+		<div class="mt-6 flex justify-center">
+			<Button variant="secondary" onclick={loadMore} loading={loadingMore}>Load More</Button>
+		</div>
+	{/if}
 
-<Footer />
+	<!-- Info -->
+	<p class="mt-6 text-center text-sm text-text-tertiary">
+		Click on any row to view the developer's portfolio
+	</p>
+</div>

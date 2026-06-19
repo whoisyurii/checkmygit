@@ -8,7 +8,7 @@
 
 <button
 	onclick={handleToggle}
-	class="relative inline-flex h-9 w-9 items-center justify-center rounded-md text-text-primary transition-colors hover:bg-bg-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-green focus-visible:ring-offset-2"
+	class="relative inline-flex h-9 w-9 items-center justify-center rounded-md text-text-primary transition-colors hover:bg-bg-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
 	aria-label={themeState.isDark ? 'Switch to light mode' : 'Switch to dark mode'}
 >
 	<!-- Sun icon (shown in dark mode) -->

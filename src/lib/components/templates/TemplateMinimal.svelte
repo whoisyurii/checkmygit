@@ -67,7 +67,7 @@
 					href={profile.user.websiteUrl.startsWith('http') ? profile.user.websiteUrl : `https://${profile.user.websiteUrl}`}
 					target="_blank"
 					rel="noopener noreferrer"
-					class="text-accent-green hover:underline"
+					class="text-accent hover:underline"
 				>
 					{profile.user.websiteUrl.replace(/^https?:\/\//, '')}
 				</a>
@@ -119,7 +119,7 @@
 			{#if totalContributions > 0}
 				<div class="h-12 w-px bg-border-default"></div>
 				<div>
-					<div class="text-3xl font-bold text-accent-green">
+					<div class="text-3xl font-bold text-accent">
 						{formatNumber(totalContributions)}
 					</div>
 					<div class="text-sm text-text-secondary">Contributions</div>
@@ -174,7 +174,7 @@
 					>
 						<div class="flex items-start justify-between">
 							<div>
-								<h3 class="text-lg font-semibold text-accent-green group-hover:underline">
+								<h3 class="text-lg font-semibold text-accent group-hover:underline">
 									{repo.name}
 								</h3>
 								{#if repo.description}
@@ -212,7 +212,7 @@
 				href="https://github.com/{profile.user.login}"
 				target="_blank"
 				rel="noopener noreferrer"
-				class="text-accent-green hover:underline"
+				class="text-accent hover:underline"
 			>
 				View on GitHub →
 			</a>

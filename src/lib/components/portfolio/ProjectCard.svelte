@@ -38,7 +38,7 @@
 					d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
 				/>
 			</svg>
-			<h3 class="truncate font-semibold text-accent-green group-hover:underline">
+			<h3 class="truncate font-semibold text-accent group-hover:underline">
 				{repo.name}
 			</h3>
 		</div>
@@ -65,7 +65,7 @@
 		<div class="mb-3 flex flex-wrap gap-1">
 			{#each repo.topics.slice(0, 3) as topic}
 				<span
-					class="rounded-full bg-accent-green/10 px-2 py-0.5 text-xs text-accent-green"
+					class="rounded-full bg-accent/10 px-2 py-0.5 text-xs text-accent"
 				>
 					{topic}
 				</span>

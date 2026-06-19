@@ -26,7 +26,7 @@
 					About
 				</a>
 				<a
-					href={resolve('/globe')}
+					href={resolve('/explore/globe')}
 					class="text-sm text-text-secondary transition-colors hover:text-text-primary"
 				>
 					Globe

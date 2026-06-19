@@ -1,6 +1,6 @@
 /* Inter font - must be at top */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap');
 
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
@@ -10,39 +10,39 @@
 @theme {
 	/* Background colors */
 	--color-bg-primary: #030303; /* Deep void black */
-	--color-bg-secondary: #0A0A0A; /* Subtle surface */
+	--color-bg-secondary: #0a0a0a; /* Subtle surface */
 	--color-bg-tertiary: #161616; /* Card background */
 	--color-bg-canvas: #000000;
 
 	/* Border colors */
 	--color-border-default: #222222;
-	--color-border-muted: #1A1A1A;
+	--color-border-muted: #1a1a1a;
 	--color-border-subtle: #333333;
 	--color-border-highlight: #444444;
 
 	/* Text colors */
-	--color-text-primary: #EDEDED;
-	--color-text-secondary: #A1A1A1;
+	--color-text-primary: #ededed;
+	--color-text-secondary: #a1a1a1;
 	--color-text-tertiary: #666666;
 	--color-text-placeholder: #555555;
 	--color-text-disabled: #333333;
 
 	/* Accent colors */
-	--color-accent-blue: #3291FF; /* Vercel Blue */
-	--color-accent-green: #2EA043; /* GitHub Green */
-	--color-accent-purple: #8B5CF6; /* Linear Purple */
-	--color-accent-yellow: #F5A623;
-	--color-accent-orange: #F97316;
-	--color-accent-red: #E00;
-	--color-accent-pink: #EC4899;
-	--color-saas-green: #0D3A20;
+	--color-accent-blue: #3291ff; /* Vercel Blue */
+	--color-accent: #2dd4bf; /* Teal */
+	--color-accent-purple: #8b5cf6; /* Linear Purple */
+	--color-accent-yellow: #f5a623;
+	--color-accent-orange: #f97316;
+	--color-accent-red: #e00;
+	--color-accent-pink: #ec4899;
+	--color-accent-deep: #0b3b35;
 
 	/* Button colors */
-	--color-btn-primary-bg: #EDEDED;
+	--color-btn-primary-bg: #ededed;
 	--color-btn-primary-text: #000000;
-	--color-btn-primary-hover: #FFFFFF;
-	--color-btn-secondary-bg: #1A1A1A;
-	--color-btn-secondary-text: #EDEDED;
+	--color-btn-primary-hover: #ffffff;
+	--color-btn-secondary-bg: #1a1a1a;
+	--color-btn-secondary-text: #ededed;
 	--color-btn-secondary-hover: #222222;
 
 	/* Shadows & Glows */
@@ -68,42 +68,45 @@
 	--spacing-2xl: 64px;
 
 	/* Font family */
-	--font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+	--font-sans:
+		'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial,
+		sans-serif;
 	--font-mono: 'SF Mono', 'Roboto Mono', Menlo, monospace;
-	--font-abril: 'Abril Fatface', serif;
+	--font-display: 'Space Grotesk', 'Inter', sans-serif;
 }
 
 /* Light Theme Override */
 :root.light {
 	/* Background colors */
-	--color-bg-primary: #FFFFFF;
-	--color-bg-secondary: #FAFAFA;
-	--color-bg-tertiary: #F5F5F5;
-	--color-bg-canvas: #FFFFFF;
+	--color-bg-primary: #ffffff;
+	--color-bg-secondary: #fafafa;
+	--color-bg-tertiary: #f5f5f5;
+	--color-bg-canvas: #ffffff;
 
 	/* Border colors */
-	--color-border-default: #E5E5E5;
-	--color-border-muted: #EBEBEB;
-	--color-border-subtle: #D4D4D4;
-	--color-border-highlight: #C4C4C4;
+	--color-border-default: #e5e5e5;
+	--color-border-muted: #ebebeb;
+	--color-border-subtle: #d4d4d4;
+	--color-border-highlight: #c4c4c4;
 
 	/* Text colors */
 	--color-text-primary: #171717;
 	--color-text-secondary: #525252;
 	--color-text-tertiary: #737373;
-	--color-text-placeholder: #A3A3A3;
-	--color-text-disabled: #D4D4D4;
+	--color-text-placeholder: #a3a3a3;
+	--color-text-disabled: #d4d4d4;
 
 	/* Button colors */
 	--color-btn-primary-bg: #171717;
-	--color-btn-primary-text: #FFFFFF;
+	--color-btn-primary-text: #ffffff;
 	--color-btn-primary-hover: #262626;
-	--color-btn-secondary-bg: #F5F5F5;
+	--color-btn-secondary-bg: #f5f5f5;
 	--color-btn-secondary-text: #171717;
-	--color-btn-secondary-hover: #E5E5E5;
+	--color-btn-secondary-hover: #e5e5e5;
 
-	/* Adjusted accent for light background */
-	--color-saas-green: #D1FAE5;
+	/* Adjusted accents for light background (bright teal needs a deeper tone on white) */
+	--color-accent: #0f9e89;
+	--color-accent-deep: #ccfbf1;
 
 	/* Shadows adjusted for light mode */
 	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -122,7 +125,9 @@ html {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	scroll-behavior: smooth;
-	transition: background-color 0.2s ease, color 0.2s ease;
+	transition:
+		background-color 0.2s ease,
+		color 0.2s ease;
 }
 
 :root.light {
@@ -135,14 +140,16 @@ body {
 	background-color: var(--color-bg-primary);
 	background-image:
 		radial-gradient(circle at 50% 0%, rgba(120, 120, 120, 0.05) 0%, transparent 40%),
-		linear-gradient(to bottom, transparent, rgba(0,0,0,1));
-	transition: background-color 0.2s ease, background-image 0.2s ease;
+		linear-gradient(to bottom, transparent, rgba(0, 0, 0, 1));
+	transition:
+		background-color 0.2s ease,
+		background-image 0.2s ease;
 }
 
 :root.light body {
 	background-image:
 		radial-gradient(circle at 50% 0%, rgba(0, 0, 0, 0.02) 0%, transparent 40%),
-		linear-gradient(to bottom, transparent, rgba(250,250,250,1));
+		linear-gradient(to bottom, transparent, rgba(250, 250, 250, 1));
 }
 
 /* Scrollbar styling */
@@ -166,12 +173,12 @@ body {
 
 /* Selection */
 ::selection {
-	background-color: var(--color-saas-green);
+	background-color: var(--color-accent-deep);
 	color: var(--color-text-primary); /* Ensure visibility */
 }
 
 :focus-visible {
-	outline: 2px solid var(--color-saas-green);
+	outline: 2px solid var(--color-accent-deep);
 	outline-offset: 2px;
 }
 
@@ -184,8 +191,14 @@ a {
 
 /* Animations */
 @keyframes fadeIn {
-	from { opacity: 0; transform: translateY(10px); }
-	to { opacity: 1; transform: translateY(0); }
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
 .animate-fade-in {
@@ -213,7 +226,10 @@ a {
 	backdrop-filter: blur(12px);
 	border: 1px solid rgba(255, 255, 255, 0.08);
 	box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-	transition: background 0.2s ease, border 0.2s ease, box-shadow 0.2s ease;
+	transition:
+		background 0.2s ease,
+		border 0.2s ease,
+		box-shadow 0.2s ease;
 }
 
 :root.light .glass-panel {
@@ -230,16 +246,33 @@ a {
 	text-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
+/* Teal gradient text for hero display headings */
+.text-gradient {
+	background: linear-gradient(135deg, #2dd4bf 0%, #22d3ee 100%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+
+:root.light .text-gradient {
+	background: linear-gradient(135deg, #0f9e89 0%, #0891b2 100%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+
 .grid-bg {
 	background-size: 50px 50px;
-	background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-					  linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+	background-image:
+		linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+		linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
 	mask-image: radial-gradient(circle at 50% 50%, black 0%, transparent 80%);
 }
 
 :root.light .grid-bg {
-	background-image: linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
-					  linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+	background-image:
+		linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+		linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
 }
 
 .saas-glow {
@@ -249,16 +282,18 @@ a {
 	transform: translateX(-50%);
 	width: 1000px;
 	height: 500px;
-	background: var(--color-saas-green);
+	background: var(--color-accent-deep);
 	filter: blur(120px);
 	opacity: 0.7;
 	pointer-events: none;
 	z-index: 0;
-	transition: background 0.2s ease, opacity 0.2s ease;
+	transition:
+		background 0.2s ease,
+		opacity 0.2s ease;
 }
 
 :root.light .saas-glow {
-	background: #10B981;
+	background: #14b8a6;
 	opacity: 0.15;
 }
 

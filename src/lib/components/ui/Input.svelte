@@ -68,7 +68,7 @@
 			w-full rounded-md border bg-bg-secondary
 			text-text-primary placeholder-text-placeholder
 			transition-colors
-			focus:border-accent-green focus:outline-none focus:ring-1 focus:ring-accent-green
+			focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent
 			disabled:cursor-not-allowed disabled:opacity-50
 			{sizeClasses[size]}
 			{icon ? 'pl-10' : ''}

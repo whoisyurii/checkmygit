@@ -32,6 +32,6 @@
 		placeholder="Search users..."
 		bind:value={searchValue}
 		onkeydown={handleSearch}
-		class="h-9 w-full rounded-lg border border-border-default bg-bg-secondary pl-9 pr-3 text-sm text-text-primary placeholder-text-tertiary transition-all focus:border-saas-green focus:bg-bg-secondary focus:outline-none focus:ring-1 focus:ring-saas-green"
+		class="h-9 w-full rounded-lg border border-border-default bg-bg-secondary pl-9 pr-3 text-sm text-text-primary placeholder-text-tertiary transition-all focus:border-accent-deep focus:bg-bg-secondary focus:outline-none focus:ring-1 focus:ring-accent-deep"
 	/>
 </div>
