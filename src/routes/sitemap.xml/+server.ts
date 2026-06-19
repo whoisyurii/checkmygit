@@ -16,10 +16,11 @@ type StaticUrl = {
 
 const STATIC_URLS: StaticUrl[] = [
 	{ path: '/', changefreq: 'weekly', priority: '1.0' },
-	{ path: '/rankings', changefreq: 'daily', priority: '0.9' },
-	{ path: '/trending', changefreq: 'daily', priority: '0.9' },
-	{ path: '/trending?since=weekly', changefreq: 'weekly', priority: '0.8' },
-	{ path: '/trending?since=monthly', changefreq: 'monthly', priority: '0.7' },
+	{ path: '/explore/rankings', changefreq: 'daily', priority: '0.9' },
+	{ path: '/explore/trending', changefreq: 'daily', priority: '0.9' },
+	{ path: '/explore/trending?since=weekly', changefreq: 'weekly', priority: '0.8' },
+	{ path: '/explore/trending?since=monthly', changefreq: 'monthly', priority: '0.7' },
+	{ path: '/explore/globe', changefreq: 'weekly', priority: '0.7' },
 	{ path: '/about', changefreq: 'monthly', priority: '0.5' },
 	{ path: '/privacy', changefreq: 'monthly', priority: '0.3' }
 ];
@@ -36,7 +37,7 @@ function buildTrendingLanguageUrls(): StaticUrl[] {
 		const langParam = encodeURIComponent(lang);
 		(['daily', 'weekly', 'monthly'] as const).forEach((since) => {
 			urls.push({
-				path: `/trending?language=${langParam}&since=${since}`,
+				path: `/explore/trending?language=${langParam}&since=${since}`,
 				changefreq: since,
 				priority: TRENDING_LANG_PRIORITIES[since]
 			});

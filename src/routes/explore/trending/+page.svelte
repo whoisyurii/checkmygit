@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { pushState } from '$app/navigation';
-	import Header from '$lib/components/layout/Header.svelte';
-	import Footer from '$lib/components/layout/Footer.svelte';
 	import Card from '$lib/components/ui/Card.svelte';
-	import FireIcon from '$lib/components/ui/FireIcon.svelte';
+	import TrendIcon from '$lib/components/ui/TrendIcon.svelte';
 	import SegmentedTabs from '$lib/components/ui/SegmentedTabs.svelte';
 	import TrendingTable from '$lib/components/rankings/TrendingTable.svelte';
 	import TrendingTableSkeleton from '$lib/components/rankings/TrendingTableSkeleton.svelte';
@@ -40,9 +38,7 @@
 	/* svelte-ignore state_referenced_locally */
 	let language = $state<string>(data.language);
 	/* svelte-ignore state_referenced_locally */
-	let repos = $state<TrendingResult>(
-		data.repos instanceof Promise ? PENDING_REPOS : data.repos
-	);
+	let repos = $state<TrendingResult>(data.repos instanceof Promise ? PENDING_REPOS : data.repos);
 	/* svelte-ignore state_referenced_locally */
 	let loading = $state<boolean>(data.repos instanceof Promise);
 
@@ -130,7 +126,7 @@
 	}
 
 	function pushTrendingUrl() {
-		const url = new URL('/trending', window.location.origin);
+		const url = new URL('/explore/trending', window.location.origin);
 		if (since !== DEFAULT_TRENDING_WINDOW) url.searchParams.set('since', since);
 		if (language) url.searchParams.set('language', language);
 		pushState(url, {});
@@ -158,7 +154,7 @@
 	const h1Title = $derived(`Trending ${langPrefix}Repos ${WINDOW_LABEL[since]}`);
 
 	const canonicalUrl = $derived.by(() => {
-		const u = new URL(`${SITE_URL}/trending`);
+		const u = new URL(`${SITE_URL}/explore/trending`);
 		if (since !== DEFAULT_TRENDING_WINDOW) u.searchParams.set('since', since);
 		if (language) u.searchParams.set('language', language);
 		return u.toString();
@@ -206,84 +202,75 @@
 	{/if}
 </svelte:head>
 
-<Header />
-
-<main class="relative min-h-screen w-full overflow-x-hidden">
-	<div class="saas-glow"></div>
-	<div class="grid-bg absolute inset-0 z-0"></div>
-
-	<div class="relative z-10 mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
-		<!-- Header section -->
-		<div class="mb-8 text-center">
-			<h1
-				class="mb-3 inline-flex items-center gap-2.5 text-3xl font-bold text-text-primary sm:text-4xl"
-			>
-				<FireIcon size={36} />
-				Trending
-				{#if language}
-					<span class="text-text-secondary">{language}</span>
-				{/if}
-			</h1>
-			<p class="text-lg text-text-secondary">
-				The hottest repositories on GitHub right now — updated regularly.
-			</p>
-		</div>
-
-		<!-- Window tabs -->
-		<div class="mb-6 flex justify-center">
-			<SegmentedTabs
-				items={windowItems}
-				value={since}
-				onchange={switchWindow}
-				ariaLabel="Time window"
-			>
-				{#snippet icon({ active })}
-					{#if active}<FireIcon size={14} />{/if}
-				{/snippet}
-			</SegmentedTabs>
-		</div>
-
-		<!-- Language filter -->
-		<div class="mb-6 flex flex-wrap items-center justify-center gap-4">
-			<TrendingFilters {language} onchange={changeLanguage} />
-		</div>
-
-		<!-- Content -->
-		<Card variant="default" padding="none">
-			{#if loading}
-				<TrendingTableSkeleton />
-			{:else if !repos.success}
-				<div class="p-8 text-center">
-					<svg
-						class="mx-auto mb-4 h-12 w-12 text-accent-red"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-						/>
-					</svg>
-					<p class="text-text-secondary">
-						{repos.error || 'Failed to load trending repositories'}
-					</p>
-				</div>
-			{:else if repos.data.length === 0}
-				<div class="p-8 text-center">
-					<p class="text-text-secondary">No trending repositories found.</p>
-				</div>
-			{:else}
-				<TrendingTable repos={repos.data} {since} />
+<div class="mx-auto max-w-6xl px-4 pt-6 pb-12 sm:px-6 lg:px-8">
+	<!-- Header section -->
+	<div class="mb-8 text-center">
+		<h1
+			class="mb-3 inline-flex items-center justify-center gap-2.5 text-3xl font-bold text-text-primary sm:text-4xl"
+		>
+			<TrendIcon size={32} class="text-accent" />
+			Trending
+			{#if language}
+				<span class="text-text-secondary">{language}</span>
 			{/if}
-		</Card>
-
-		<p class="mt-6 text-center text-sm text-text-tertiary">
-			Click any row to view the developer's CheckMyGit portfolio.
+		</h1>
+		<p class="text-lg text-text-secondary">
+			The hottest repositories on GitHub right now — updated regularly.
 		</p>
 	</div>
-</main>
 
-<Footer />
+	<!-- Window tabs -->
+	<div class="mb-6 flex justify-center">
+		<SegmentedTabs
+			items={windowItems}
+			value={since}
+			onchange={switchWindow}
+			ariaLabel="Time window"
+		>
+			{#snippet icon({ active })}
+				{#if active}<TrendIcon size={14} />{/if}
+			{/snippet}
+		</SegmentedTabs>
+	</div>
+
+	<!-- Language filter -->
+	<div class="mb-6 flex flex-wrap items-center justify-center gap-4">
+		<TrendingFilters {language} onchange={changeLanguage} />
+	</div>
+
+	<!-- Content -->
+	<Card variant="default" padding="none">
+		{#if loading}
+			<TrendingTableSkeleton />
+		{:else if !repos.success}
+			<div class="p-8 text-center">
+				<svg
+					class="mx-auto mb-4 h-12 w-12 text-accent-red"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+					/>
+				</svg>
+				<p class="text-text-secondary">
+					{repos.error || 'Failed to load trending repositories'}
+				</p>
+			</div>
+		{:else if repos.data.length === 0}
+			<div class="p-8 text-center">
+				<p class="text-text-secondary">No trending repositories found.</p>
+			</div>
+		{:else}
+			<TrendingTable repos={repos.data} {since} />
+		{/if}
+	</Card>
+
+	<p class="mt-6 text-center text-sm text-text-tertiary">
+		Click any row to view the developer's CheckMyGit portfolio.
+	</p>
+</div>

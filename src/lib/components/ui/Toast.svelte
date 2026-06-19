@@ -11,7 +11,7 @@
 	let { type = 'info', message, visible = true, onclose }: Props = $props();
 
 	const typeClasses = {
-		success: 'bg-[var(--color-accent-green)] text-white',
+		success: 'bg-[var(--color-accent)] text-white',
 		error: 'bg-[var(--color-accent-red)] text-white',
 		warning: 'bg-[var(--color-accent-yellow)] text-black',
 		info: 'bg-[var(--color-accent-blue)] text-white'

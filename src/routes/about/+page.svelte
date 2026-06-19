@@ -67,27 +67,27 @@
 			<h2 class="text-xl font-semibold text-text-primary">Features</h2>
 			<ul class="space-y-3 text-text-secondary">
 				<li class="flex items-start gap-3">
-					<span class="mt-1 text-accent-green">&#10003;</span>
+					<span class="mt-1 text-accent">&#10003;</span>
 					<span><span class="text-text-primary">Multiple templates</span> - Choose from GitHub, Bento, or Minimal layouts</span>
 				</li>
 				<li class="flex items-start gap-3">
-					<span class="mt-1 text-accent-green">&#10003;</span>
+					<span class="mt-1 text-accent">&#10003;</span>
 					<span><span class="text-text-primary">Contribution graph</span> - Visual representation of coding activity</span>
 				</li>
 				<li class="flex items-start gap-3">
-					<span class="mt-1 text-accent-green">&#10003;</span>
+					<span class="mt-1 text-accent">&#10003;</span>
 					<span><span class="text-text-primary">Language breakdown</span> - See programming language distribution</span>
 				</li>
 				<li class="flex items-start gap-3">
-					<span class="mt-1 text-accent-green">&#10003;</span>
+					<span class="mt-1 text-accent">&#10003;</span>
 					<span><span class="text-text-primary">Project showcase</span> - Highlight top repositories with stars and descriptions</span>
 				</li>
 				<li class="flex items-start gap-3">
-					<span class="mt-1 text-accent-green">&#10003;</span>
+					<span class="mt-1 text-accent">&#10003;</span>
 					<span><span class="text-text-primary">Export as image</span> - Download your portfolio as a PNG</span>
 				</li>
 				<li class="flex items-start gap-3">
-					<span class="mt-1 text-accent-green">&#10003;</span>
+					<span class="mt-1 text-accent">&#10003;</span>
 					<span><span class="text-text-primary">Shareable links</span> - Unique URLs for each profile</span>
 				</li>
 			</ul>

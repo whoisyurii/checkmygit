@@ -305,7 +305,7 @@
 					<div class="mb-4 text-6xl">😕</div>
 					<h2 class="mb-2 text-xl font-semibold text-text-primary">Something went wrong</h2>
 					<p class="mb-4 text-text-secondary">{loadError.message || 'Failed to load profile'}</p>
-					<a href={resolve('/')} class="text-accent-green hover:underline">← Back to home</a>
+					<a href={resolve('/')} class="text-accent hover:underline">← Back to home</a>
 				</div>
 			</div>
 		{:else if profile}

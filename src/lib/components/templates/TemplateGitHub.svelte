@@ -52,7 +52,7 @@
 						</p>
 					</div>
 					<div class="text-right text-xs text-text-tertiary">
-						Powered by <span class="font-semibold text-accent-green">CheckMyGit</span>
+						Powered by <span class="font-semibold text-accent">CheckMyGit</span>
 					</div>
 				</div>
 			</Card>

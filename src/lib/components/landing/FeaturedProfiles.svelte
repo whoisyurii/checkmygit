@@ -37,10 +37,10 @@
 								decoding="async"
 								class="h-12 w-12 rounded-full border border-border-subtle bg-bg-secondary"
 							/>
-							<div class="absolute -bottom-1 -right-1 rounded-full border-2 border-bg-tertiary bg-accent-green p-1"></div>
+							<div class="absolute -bottom-1 -right-1 rounded-full border-2 border-bg-tertiary bg-accent p-1"></div>
 						</div>
 						<div>
-							<h3 class="font-semibold text-text-primary group-hover:text-accent-green">{profile.name}</h3>
+							<h3 class="font-semibold text-text-primary group-hover:text-accent">{profile.name}</h3>
 							<p class="text-xs text-text-tertiary">@{profile.username}</p>
 						</div>
 					</div>

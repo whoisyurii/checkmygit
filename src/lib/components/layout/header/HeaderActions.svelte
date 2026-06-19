@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/Button.svelte';
-	import FireIcon from '$lib/components/ui/FireIcon.svelte';
 	import ThemeToggle from '$lib/components/ui/ThemeToggle.svelte';
+	import { page } from '$app/stores';
 	import { REPO_URL } from '$lib/constants';
 	import { githubStarsState } from '$lib/stores/githubStars.svelte';
 	import { formatNumber } from '$lib/utils/github-transform';
@@ -15,6 +15,8 @@
 
 	let { showControls = false, onExport, onShare, onQRCode }: Props = $props();
 
+	let isExplore = $derived($page.url.pathname.startsWith('/explore'));
+
 	$effect(() => {
 		githubStarsState.init();
 	});
@@ -22,21 +24,22 @@
 
 <div class="flex shrink-0 items-center gap-2">
 	<!-- Hidden in profile preview on mobile to avoid header overflow -->
-	<Button variant="ghost" size="sm" href="/trending" class={showControls ? 'hidden! sm:inline-flex!' : ''}>
-		<FireIcon size={16} />
-		<span class="hidden sm:inline">Trending</span>
-	</Button>
-
-	<Button variant="ghost" size="sm" href="/rankings" class={showControls ? 'hidden! sm:inline-flex!' : ''}>
-		<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+	<Button
+		variant="ghost"
+		size="sm"
+		href="/explore/trending"
+		class="{showControls ? 'hidden! sm:inline-flex!' : ''} {isExplore ? 'text-accent!' : ''}"
+	>
+		<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+			<circle cx="12" cy="12" r="9" stroke-width="2" />
 			<path
 				stroke-linecap="round"
 				stroke-linejoin="round"
 				stroke-width="2"
-				d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+				d="M14.9 9.1l-1.7 4.1-4.1 1.7 1.7-4.1 4.1-1.7z"
 			/>
 		</svg>
-		<span class="hidden sm:inline">Rankings</span>
+		<span class="hidden sm:inline">Explore</span>
 	</Button>
 
 	{#if showControls}
@@ -87,7 +90,10 @@
 			{#if githubStarsState.count !== null}
 				<span class="tabular-nums">{formatNumber(githubStarsState.count)}</span>
 			{:else}
-				<span aria-hidden="true" class="inline-block h-3 w-7 animate-pulse rounded bg-text-tertiary/30"></span>
+				<span
+					aria-hidden="true"
+					class="inline-block h-3 w-7 animate-pulse rounded bg-text-tertiary/30"
+				></span>
 			{/if}
 			<span class="hidden sm:inline">Github</span>
 		</span>

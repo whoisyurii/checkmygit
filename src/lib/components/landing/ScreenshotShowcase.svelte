@@ -43,7 +43,7 @@
 			style="transform: rotateX({rotateX}deg) scale({scale}); transform-origin: center bottom; will-change: transform;"
 		>
 			<!-- Subtle green glow at bottom -->
-			<div class="absolute -bottom-6 inset-x-16 h-20 bg-saas-green blur-3xl opacity-70"></div>
+			<div class="absolute -bottom-6 inset-x-16 h-20 bg-accent-deep blur-3xl opacity-70"></div>
 
 			<div
 				class="screenshot-card relative overflow-hidden rounded-2xl border border-border-subtle bg-bg-tertiary shadow-2xl md:rounded-3xl"

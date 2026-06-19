@@ -125,7 +125,7 @@
 
 <!-- {#if totalContributions > 0}
 	<div class="mt-4 text-center text-sm text-text-secondary">
-		<span class="font-semibold text-accent-green">
+		<span class="font-semibold text-accent">
 			{formatNumber(totalContributions)}
 		</span>
 		contributions in the last year

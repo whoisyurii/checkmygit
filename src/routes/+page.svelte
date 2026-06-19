@@ -4,6 +4,7 @@
 	import Header from '$lib/components/layout/Header.svelte';
 	import Footer from '$lib/components/layout/Footer.svelte';
 	import Hero from '$lib/components/landing/Hero.svelte';
+	import DitherBackdrop from '$lib/components/landing/DitherBackdrop.svelte';
 	import ScreenshotShowcase from '$lib/components/landing/ScreenshotShowcase.svelte';
 	import Features from '$lib/components/landing/Features.svelte';
 	import FeaturedProfiles from '$lib/components/landing/FeaturedProfiles.svelte';
@@ -42,11 +43,9 @@
 <Header />
 
 <main class="relative min-h-screen w-full overflow-hidden">
-	<!-- SaaS Glow -->
-	<div class="saas-glow"></div>
-	<!-- Background grid effect -->
-	<div class="absolute inset-0 z-0 grid-bg"></div>
-	
+	<!-- Floating dithered field behind the hero, fading out before the showcase -->
+	<DitherBackdrop />
+
 	<Hero totalPortfolios={data.totalPortfolios} />
 	<ScreenshotShowcase />
 	<Features />

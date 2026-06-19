@@ -7,8 +7,8 @@
 
 	let { class: className = '' }: Props = $props();
 
-	const logoBgColor = $derived(themeState.isDark ? '#041B11' : '#D1FAE5');
-	const logoFillColor = $derived(themeState.isDark ? 'white' : '#065F46');
+	const logoBgColor = $derived(themeState.isDark ? '#0B3B35' : '#CCFBF1');
+	const logoFillColor = $derived(themeState.isDark ? 'white' : '#0F766E');
 	const textColorClass = $derived(themeState.isDark ? 'text-white/50' : 'text-black/40');
 </script>
 

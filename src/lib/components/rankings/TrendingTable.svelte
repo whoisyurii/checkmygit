@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as Table from '$lib/components/ui/table';
 	import Badge from '$lib/components/ui/Badge.svelte';
-	import FireIcon from '$lib/components/ui/FireIcon.svelte';
+	import TrendIcon from '$lib/components/ui/TrendIcon.svelte';
 	import { formatNumber } from '$lib/utils/github-transform';
 	import type { TrendingRepository, TrendingWindow } from '$lib/types/trending';
 	import { WINDOW_PERIOD_TEXT } from '$lib/types/trending';
@@ -64,7 +64,7 @@
 				<Table.Cell class="text-right">
 					{#if repo.periodStars > 0}
 						<div class="flex items-center justify-end gap-1.5">
-							<FireIcon size={16} animated={false} />
+							<TrendIcon size={16} class="text-accent" />
 							<span class="font-semibold text-text-primary">+{formatNumber(repo.periodStars)}</span>
 						</div>
 					{:else}

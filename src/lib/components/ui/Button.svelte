@@ -32,10 +32,10 @@
 
 	const variantClasses = {
 		primary:
-			'bg-btn-primary-bg text-btn-primary-text hover:bg-btn-primary-hover focus-visible:ring-accent-green',
+			'bg-btn-primary-bg text-btn-primary-text hover:bg-btn-primary-hover focus-visible:ring-accent',
 		secondary:
-			'bg-btn-secondary-bg text-btn-secondary-text border border-border-default hover:bg-btn-secondary-hover hover:border-border-muted focus-visible:ring-accent-green',
-		ghost: 'text-text-primary hover:text-text-primary hover:bg-bg-tertiary focus-visible:ring-accent-green',
+			'bg-btn-secondary-bg text-btn-secondary-text border border-border-default hover:bg-btn-secondary-hover hover:border-border-muted focus-visible:ring-accent',
+		ghost: 'text-text-primary hover:text-text-primary hover:bg-bg-tertiary focus-visible:ring-accent',
 		danger: 'bg-accent-red text-white hover:bg-red-600 focus-visible:ring-accent-red'
 	};
 
