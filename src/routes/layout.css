@@ -270,42 +270,6 @@ a {
 	);
 }
 
-.grid-bg {
-	background-size: 50px 50px;
-	background-image:
-		linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-		linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-	mask-image: radial-gradient(circle at 50% 50%, black 0%, transparent 80%);
-}
-
-:root.light .grid-bg {
-	background-image:
-		linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
-		linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
-}
-
-.saas-glow {
-	position: absolute;
-	top: -100px;
-	left: 50%;
-	transform: translateX(-50%);
-	width: 1000px;
-	height: 500px;
-	background: var(--color-accent-deep);
-	filter: blur(120px);
-	opacity: 0.7;
-	pointer-events: none;
-	z-index: 0;
-	transition:
-		background 0.2s ease,
-		opacity 0.2s ease;
-}
-
-:root.light .saas-glow {
-	background: #14b8a6;
-	opacity: 0.15;
-}
-
 /* Page Transition Animations - Slow liquid swipe bottom-to-top */
 @keyframes pageExitUp {
 	0% {

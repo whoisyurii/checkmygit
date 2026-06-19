@@ -4,7 +4,7 @@
 	import Header from '$lib/components/layout/Header.svelte';
 	import Footer from '$lib/components/layout/Footer.svelte';
 	import Hero from '$lib/components/landing/Hero.svelte';
-	import DitherBackground from '$lib/components/landing/DitherBackground.svelte';
+	import DitherBackdrop from '$lib/components/landing/DitherBackdrop.svelte';
 	import ScreenshotShowcase from '$lib/components/landing/ScreenshotShowcase.svelte';
 	import Features from '$lib/components/landing/Features.svelte';
 	import FeaturedProfiles from '$lib/components/landing/FeaturedProfiles.svelte';
@@ -43,17 +43,8 @@
 <Header />
 
 <main class="relative min-h-screen w-full overflow-hidden">
-	<!-- Floating dithered field behind the hero, with a scrim that keeps the copy
-	     readable; the whole backdrop region fades out before the showcase. -->
-	<div class="pointer-events-none absolute inset-x-0 top-0 z-0 h-[820px]">
-		<div
-			class="absolute inset-0"
-			style="-webkit-mask-image: linear-gradient(to bottom, black 55%, transparent); mask-image: linear-gradient(to bottom, black 55%, transparent);"
-		>
-			<DitherBackground />
-		</div>
-		<div class="hero-scrim absolute inset-0"></div>
-	</div>
+	<!-- Floating dithered field behind the hero, fading out before the showcase -->
+	<DitherBackdrop />
 
 	<Hero totalPortfolios={data.totalPortfolios} />
 	<ScreenshotShowcase />
