@@ -172,6 +172,10 @@
 		goto(newUrl, { replaceState: true, noScroll: true });
 	}
 
+	// @font-face CSS with the font files inlined as data URLs. Cached so
+	// repeat exports don't refetch the font binaries.
+	let fontEmbedCSS: string | null = null;
+
 	// Handle export
 	async function handleExport() {
 		generatorState.enterExportMode();
@@ -180,17 +184,29 @@
 		await tick();
 
 		try {
-			const { toPng } = await import('html-to-image');
+			const { toPng, getFontEmbedCSS } = await import('html-to-image');
 			const element = document.getElementById('export-container');
 			if (!element) throw new Error('Export container not found');
 
 			// Wait for fonts to load
 			await document.fonts.ready;
 
+			// The snapshot rasterizes in an isolated SVG context where document
+			// fonts don't exist. Without embedding them, text renders in a
+			// fallback font and re-wraps inside boxes frozen at Inter metrics,
+			// breaking chips, labels and the sidebar.
+			if (fontEmbedCSS === null) {
+				try {
+					fontEmbedCSS = await getFontEmbedCSS(element);
+				} catch (fontErr) {
+					console.warn('Font embedding failed, exporting with system fonts:', fontErr);
+				}
+			}
+
 			const dataUrl = await toPng(element, {
 				pixelRatio: 2,
 				cacheBust: true,
-				skipFonts: true,
+				...(fontEmbedCSS ? { fontEmbedCSS } : { skipFonts: true }),
 				filter: (node) => {
 					// Skip script tags and other problematic nodes
 					return !(node instanceof HTMLScriptElement);
