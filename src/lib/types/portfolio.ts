@@ -27,14 +27,6 @@ export const DEFAULT_OPTIONS: PortfolioOptions = {
 // Export formats
 export type ExportFormat = 'png' | 'pdf' | 'svg';
 
-export interface ExportOptions {
-	format: ExportFormat;
-	scale: number;
-	width: number;
-	height: number;
-	transparent: boolean;
-}
-
 // Share options
 export interface ShareOptions {
 	includeTemplate: boolean;
