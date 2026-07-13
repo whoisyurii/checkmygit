@@ -17,13 +17,14 @@
 	let isLoading = $derived(navigationState.isLoading);
 
 	async function handleSubmit() {
-		const validation = validateGitHubUsername(username);
+		const trimmed = username.trim();
+		const validation = validateGitHubUsername(trimmed);
 		if (!validation.valid) {
 			error = validation.errors[0];
 			return;
 		}
 		error = '';
-		await navigationState.navigateToProfile(username.trim());
+		await navigationState.navigateToProfile(trimmed);
 	}
 
 	function handleKeydown(e: KeyboardEvent) {
