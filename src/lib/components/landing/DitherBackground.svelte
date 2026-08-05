@@ -77,6 +77,9 @@ void main() {
 	);
 	float v = fbm(p + 1.4 * r) / 0.91; // normalize 3-octave fbm to ~[0,1]
 	float field = clamp((v - 0.46) / 0.32, 0.0, 1.0);
+	// the viewport spans less than one noise period, so an unlucky seed/time can
+	// drop the whole screen below threshold — keep a sparse animated floor of dots
+	field = max(field, 0.10 + 0.12 * q.x);
 
 	// ordered dither: black voids, dotted mid-range, rare smooth core
 	float th = bayer8(cell);
