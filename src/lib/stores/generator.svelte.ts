@@ -1,4 +1,10 @@
-import type { TemplateType, ThemeType, PortfolioOptions, ExportFormat } from '$lib/types/portfolio';
+import {
+	TEMPLATES,
+	type TemplateType,
+	type ThemeType,
+	type PortfolioOptions,
+	type ExportFormat
+} from '$lib/types/portfolio';
 import type { GitHubProfile } from '$lib/types/github';
 import { SvelteURLSearchParams } from 'svelte/reactivity';
 
@@ -114,7 +120,7 @@ class GeneratorState {
 		const template = params.get('template');
 		const theme = params.get('theme');
 
-		if (template && ['github', 'bento', 'minimal'].includes(template)) {
+		if (template && TEMPLATES.some((t) => t.id === template)) {
 			this.template = template as TemplateType;
 		}
 		if (theme && ['dark', 'light'].includes(theme)) {

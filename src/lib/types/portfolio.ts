@@ -2,6 +2,13 @@
 
 export type TemplateType = 'github' | 'bento' | 'minimal';
 
+// Templates in display order. Single source of truth for ids and user-facing labels.
+export const TEMPLATES: { id: TemplateType; label: string; mobileLabel?: string }[] = [
+	{ id: 'github', label: 'GitHub Style', mobileLabel: 'GitHub' },
+	{ id: 'bento', label: 'Bento Grid', mobileLabel: 'Bento' },
+	{ id: 'minimal', label: 'Minimal' }
+];
+
 export type ThemeType = 'dark' | 'light';
 
 export interface PortfolioOptions {
