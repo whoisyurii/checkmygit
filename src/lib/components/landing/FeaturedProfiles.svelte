@@ -1,52 +1,55 @@
 <script lang="ts">
 	import { navigationState } from '$lib/stores/navigation.svelte';
-
-	const featuredProfiles = [
-		{ username: 'torvalds', name: 'Linus Torvalds', role: 'Creator of Linux & Git' },
-		{ username: 'rich-harris', name: 'Rich Harris', role: 'Creator of Svelte' },
-		{ username: 'whoisyurii', name: 'Yurii', role: 'Full Stack Developer' }
-	];
+	import { reveal } from '$lib/utils/reveal';
+	import { githubAvatar } from '$lib/utils/github-transform';
+	import { FEATURED_PROFILES } from '$lib/constants';
 
 	async function handleProfileClick(username: string) {
 		await navigationState.navigateToProfile(username);
 	}
 </script>
 
-<section class="animate-fade-in-delay-3 relative z-10 border-t border-border-muted bg-bg-secondary py-24">
-	<div class="mx-auto max-w-5xl px-6">
-		<div class="mb-12 text-center">
-			<h2 class="mb-4 text-3xl font-bold text-text-primary">Featured Profiles</h2>
-			<p class="text-text-secondary">See what CheckMyGit can do for these legends</p>
-		</div>
+<section class="landing-container relative z-10 py-20 md:py-[120px]">
+	<div use:reveal class="mb-12 max-w-[600px] md:mb-20">
+		<h2 class="landing-heading">Featured profiles</h2>
+		<p class="landing-body mt-2">See what CheckMyGit can do for these legends</p>
+	</div>
 
-		<div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-			{#each featuredProfiles as profile}
-				<button
-					type="button"
-					onclick={() => handleProfileClick(profile.username)}
-					class="group relative overflow-hidden rounded-2xl border border-border-default bg-bg-tertiary p-6 text-left transition-all hover:border-border-highlight hover:shadow-xl cursor-pointer"
+	<div class="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-3">
+		{#each FEATURED_PROFILES as profile, i (profile.username)}
+			<button
+				type="button"
+				use:reveal={{ y: 18, delay: i * 60 }}
+				onclick={() => handleProfileClick(profile.username)}
+				class="group flex min-w-0 cursor-pointer flex-col gap-3 rounded-xl border border-border-muted bg-bg-secondary p-6 text-left transition-colors hover:border-border-subtle md:p-10 lg:p-8"
+			>
+				<div class="flex items-center gap-4">
+					<img
+						src={githubAvatar(profile.username, 96)}
+						alt={profile.name}
+						width="48"
+						height="48"
+						loading="lazy"
+						decoding="async"
+						class="h-12 w-12 rounded-full border border-border-subtle bg-bg-tertiary"
+					/>
+					<h3 class="landing-subtitle min-w-0 truncate">{profile.name}</h3>
+				</div>
+				<p class="landing-body">{profile.role}</p>
+
+				<div
+					class="mt-2 flex w-full items-center justify-between gap-3 rounded-[10px] border border-border-muted bg-text-primary/6 px-4 py-3.5 font-mono text-sm text-text-primary"
 				>
-					<div class="flex items-center gap-4">
-						<div class="relative">
-							<img
-								src="https://github.com/{profile.username}.png"
-								alt={profile.name}
-								width="48"
-								height="48"
-								loading="lazy"
-								decoding="async"
-								class="h-12 w-12 rounded-full border border-border-subtle bg-bg-secondary"
-							/>
-							<div class="absolute -bottom-1 -right-1 rounded-full border-2 border-bg-tertiary bg-accent p-1"></div>
-						</div>
-						<div>
-							<h3 class="font-semibold text-text-primary group-hover:text-accent">{profile.name}</h3>
-							<p class="text-xs text-text-tertiary">@{profile.username}</p>
-						</div>
-					</div>
-					<p class="mt-4 text-sm font-medium text-text-secondary">{profile.role}</p>
-				</button>
-			{/each}
-		</div>
+					<span class="min-w-0 truncate">
+						<span class="text-accent select-none">/</span>{profile.username}
+					</span>
+					<span
+						class="shrink-0 font-sans text-xs text-text-tertiary transition-colors group-hover:text-text-primary"
+					>
+						Open
+					</span>
+				</div>
+			</button>
+		{/each}
 	</div>
 </section>

@@ -3,7 +3,8 @@
 
 	interface Props {
 		variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
-		size?: 'sm' | 'md' | 'lg';
+		// `pill`: fully rounded, with a ripple on hover instead of a background swap
+		size?: 'sm' | 'md' | 'lg' | 'pill';
 		disabled?: boolean;
 		loading?: boolean;
 		href?: string;
@@ -39,13 +40,25 @@
 		danger: 'bg-accent-red text-white hover:bg-red-600 focus-visible:ring-accent-red'
 	};
 
-	const sizeClasses = {
-		sm: 'h-8 px-3 text-sm rounded-md gap-1.5',
-		md: 'h-10 px-4 text-sm rounded-md gap-2',
-		lg: 'h-12 px-5 text-base rounded-lg gap-2'
+	// Pill colours; the hover feedback comes from the ripple (`.pill-ripple`), tinted by --ripple
+	const pillVariantClasses: Partial<Record<NonNullable<Props['variant']>, string>> = {
+		primary:
+			'bg-btn-primary-bg text-btn-primary-text border-transparent [--ripple:color-mix(in_srgb,var(--color-btn-primary-text)_20%,transparent)] focus-visible:ring-accent',
+		secondary:
+			'bg-text-primary/6 text-text-primary border-text-primary/15 duration-350 hover:border-text-primary/60 [--ripple:color-mix(in_srgb,var(--color-text-primary)_14%,transparent)] focus-visible:ring-accent'
 	};
 
-	const classes = $derived(`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`);
+	// A container can round every button inside it by setting --btn-radius
+	const sizeClasses = {
+		sm: 'h-8 px-3 text-sm rounded-[var(--btn-radius,var(--radius-md))] gap-1.5',
+		md: 'h-10 px-4 text-sm rounded-[var(--btn-radius,var(--radius-md))] gap-2',
+		lg: 'h-12 px-5 text-base rounded-[var(--btn-radius,var(--radius-lg))] gap-2',
+		pill: 'pill-ripple rounded-full border px-[18px] py-[11px] text-[15px] leading-[1.2] gap-1.5'
+	};
+
+	const classes = $derived(
+		`${baseClasses} ${(size === 'pill' && pillVariantClasses[variant]) || variantClasses[variant]} ${sizeClasses[size]} ${className}`
+	);
 </script>
 
 {#if href}

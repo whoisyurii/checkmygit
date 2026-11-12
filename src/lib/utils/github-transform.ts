@@ -11,6 +11,18 @@ export function formatNumber(num: number): string {
 	return num.toString();
 }
 
+// GitHub avatar at a given pixel size, from a login or an existing avatar URL.
+// Going straight to avatars.githubusercontent.com skips github.com's redirect.
+export function githubAvatar(loginOrUrl: string, size: number): string {
+	const url = new URL(
+		loginOrUrl.startsWith('https://')
+			? loginOrUrl
+			: `https://avatars.githubusercontent.com/${loginOrUrl}`
+	);
+	url.searchParams.set('s', String(size));
+	return url.toString();
+}
+
 // Format date to readable string
 export function formatDate(dateString: string): string {
 	const date = new Date(dateString);

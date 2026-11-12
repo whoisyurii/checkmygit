@@ -11,3 +11,10 @@ export const GITHUB_API_URL = 'https://api.github.com/repos/whoisyurii/checkmygi
 // Author
 export const AUTHOR_GITHUB_URL = 'https://github.com/whoisyurii';
 export const AUTHOR_LINKEDIN_URL = 'https://www.linkedin.com/in/yurii-mashchuk/';
+
+// Profiles showcased on the landing page: hero suggestions and featured cards
+export const FEATURED_PROFILES = [
+	{ username: 'torvalds', name: 'Linus Torvalds', role: 'Creator of Linux & Git' },
+	{ username: 'rich-harris', name: 'Rich Harris', role: 'Creator of Svelte' },
+	{ username: 'whoisyurii', name: 'Yurii', role: 'Full Stack Developer' }
+] as const;
