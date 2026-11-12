@@ -1,5 +1,5 @@
 /* Fonts - must be at top */
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Montserrat:wght@400&display=swap');
 
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
@@ -71,6 +71,8 @@
 		'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial,
 		sans-serif;
 	--font-mono: 'SF Mono', 'Roboto Mono', Menlo, monospace;
+	/* Landing display headings */
+	--font-display: 'Montserrat', 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 /* Light Theme Override */
@@ -203,73 +205,6 @@ a {
 	animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.animate-fade-in-delay-1 {
-	animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
-	opacity: 0;
-}
-
-.animate-fade-in-delay-2 {
-	animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
-	opacity: 0;
-}
-
-.animate-fade-in-delay-3 {
-	animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
-	opacity: 0;
-}
-
-/* Utilities */
-.glass-panel {
-	background: rgba(22, 22, 22, 0.6);
-	backdrop-filter: blur(12px);
-	border: 1px solid rgba(255, 255, 255, 0.08);
-	box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-	transition:
-		background 0.2s ease,
-		border 0.2s ease,
-		box-shadow 0.2s ease;
-}
-
-:root.light .glass-panel {
-	background: rgba(255, 255, 255, 0.7);
-	border: 1px solid rgba(0, 0, 0, 0.08);
-	box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
-}
-
-.glow-text {
-	text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-}
-
-:root.light .glow-text {
-	text-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-}
-
-/* Teal gradient text for hero display headings */
-.text-gradient {
-	background: linear-gradient(135deg, #2dd4bf 0%, #22d3ee 100%);
-	-webkit-background-clip: text;
-	background-clip: text;
-	color: transparent;
-}
-
-:root.light .text-gradient {
-	background: linear-gradient(135deg, #0f9e89 0%, #0891b2 100%);
-	-webkit-background-clip: text;
-	background-clip: text;
-	color: transparent;
-}
-
-/* Dims the dithered field behind the hero copy so text stays readable.
-   color-mix keeps it tied to the page background, so it works in both themes. */
-.hero-scrim {
-	background: radial-gradient(
-		58% 48% at 50% 38%,
-		color-mix(in srgb, var(--color-bg-primary) 90%, transparent) 0%,
-		color-mix(in srgb, var(--color-bg-primary) 55%, transparent) 42%,
-		transparent 70%
-	);
-}
-
 /* Page Transition Animations - Slow liquid swipe bottom-to-top */
 @keyframes pageExitUp {
 	0% {
@@ -307,4 +242,190 @@ a {
 body:has(.page-exit),
 body:has(.page-enter) {
 	overflow: hidden;
+}
+
+/* ---------------------------------------------------------------------------
+   Landing page system: container, type scale, pill buttons and backdrops.
+   Every color resolves through the theme tokens above, so both themes work.
+   --------------------------------------------------------------------------- */
+
+.landing-container {
+	width: min(100% - 48px, 1140px);
+	margin-inline: auto;
+}
+
+@media (min-width: 768px) {
+	.landing-container {
+		width: min(100% - 144px, 1140px);
+	}
+}
+
+@media (min-width: 1560px) {
+	.landing-container {
+		width: min(100% - 160px, 1280px);
+	}
+}
+
+/* Type scale */
+.landing-hero-title,
+.landing-heading {
+	font-family: var(--font-display);
+	font-weight: 400;
+	letter-spacing: -0.02em;
+	line-height: 150%;
+	color: var(--color-text-primary);
+}
+
+.landing-hero-title {
+	font-size: 28px;
+}
+
+@media (min-width: 480px) {
+	.landing-hero-title {
+		font-size: 32px;
+	}
+}
+
+.landing-heading {
+	font-size: 28px;
+}
+
+@media (min-width: 768px) {
+	.landing-hero-title {
+		font-size: 40px;
+	}
+
+	.landing-heading {
+		font-size: 36px;
+	}
+}
+
+.landing-subtitle {
+	font-size: 20px;
+	font-weight: 400;
+	letter-spacing: -0.01em;
+	line-height: 150%;
+	color: var(--color-text-primary);
+}
+
+.landing-body {
+	font-size: 16px;
+	font-weight: 400;
+	line-height: 160%;
+	text-wrap: pretty;
+	color: var(--color-text-secondary);
+}
+
+/* Ripple that grows from the centre on hover; Button's `pill` size uses it and
+   sets its colour through --ripple. In a layer so utilities still win. */
+@layer components {
+	.pill-ripple {
+		position: relative;
+		overflow: hidden;
+		isolation: isolate;
+	}
+
+	.pill-ripple::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 150%;
+		aspect-ratio: 1 / 1;
+		border-radius: 50%;
+		background: var(--ripple);
+		opacity: 0;
+		z-index: -1;
+		transform: translate(-50%, -50%) scale(0);
+		transition:
+			transform 0.36s ease-out,
+			opacity 0.1s;
+	}
+
+	@media (hover: hover) {
+		.pill-ripple:hover::after {
+			opacity: 1;
+			transform: translate(-50%, -50%) scale(1);
+		}
+	}
+}
+
+/* Hero entrance: copy rises out of a blur, the preview follows */
+@keyframes heroEnter {
+	from {
+		opacity: 0;
+		transform: translateY(var(--enter-y, 20px));
+		filter: blur(var(--enter-blur, 0));
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+		filter: blur(0);
+	}
+}
+
+.hero-enter {
+	animation: heroEnter 0.8s ease-out backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.hero-enter {
+		animation: none;
+	}
+}
+
+/* Still version of the hero colour field, under the animated canvas */
+.fluid-fallback {
+	--fluid-core: #55706a;
+	--fluid-mid: #0a453d;
+	background:
+		linear-gradient(to bottom, transparent, var(--color-bg-primary)),
+		radial-gradient(
+			at 89% 50%,
+			var(--fluid-core) 0%,
+			var(--fluid-mid) 35%,
+			var(--color-bg-primary) 75%
+		);
+}
+
+:root.light .fluid-fallback {
+	--fluid-core: #8fb8b2;
+	--fluid-mid: #99e8d9;
+}
+
+/* Dashed 90px grid with a dot at every crossing, behind the closing call to action.
+   The tile is an inline SVG (drawn once, then repeated as an image); the edge fades
+   are page-coloured gradients laid over it instead of masks. */
+.landing-grid {
+	--grid-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' fill='%23fff'%3E%3Cg fill-opacity='.08'%3E%3Crect x='10' width='70' height='.5'/%3E%3Crect y='10' width='.5' height='70'/%3E%3C/g%3E%3Cg fill-opacity='.035'%3E%3Crect width='1.8' height='1.8'/%3E%3Crect x='88.2' width='1.8' height='1.8'/%3E%3Crect y='88.2' width='1.8' height='1.8'/%3E%3Crect x='88.2' y='88.2' width='1.8' height='1.8'/%3E%3C/g%3E%3C/svg%3E");
+	background:
+		linear-gradient(to bottom, var(--color-bg-primary), transparent) top / 100% 20% no-repeat,
+		linear-gradient(to top, var(--color-bg-primary), transparent) bottom / 100% 20% no-repeat,
+		linear-gradient(to right, var(--color-bg-primary), transparent) left / 15% 100% no-repeat,
+		linear-gradient(to left, var(--color-bg-primary), transparent) right / 15% 100% no-repeat,
+		var(--grid-tile) center / 90px 90px;
+}
+
+:root.light .landing-grid {
+	--grid-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cg fill-opacity='.08'%3E%3Crect x='10' width='70' height='.5'/%3E%3Crect y='10' width='.5' height='70'/%3E%3C/g%3E%3Cg fill-opacity='.035'%3E%3Crect width='1.8' height='1.8'/%3E%3Crect x='88.2' width='1.8' height='1.8'/%3E%3Crect y='88.2' width='1.8' height='1.8'/%3E%3Crect x='88.2' y='88.2' width='1.8' height='1.8'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Three soft teal glows as one element: left, centre and right */
+.landing-glows {
+	--glow-mid: color-mix(in srgb, var(--color-accent) 45%, var(--color-accent-deep));
+	background:
+		radial-gradient(
+				closest-side,
+				color-mix(in srgb, var(--color-accent-deep) 30%, transparent),
+				transparent
+			)
+			left calc(10% - 60px) center / 900px 900px no-repeat,
+		radial-gradient(closest-side, color-mix(in srgb, var(--glow-mid) 34%, transparent), transparent)
+			center / min(1400px, 150%) 820px no-repeat,
+		radial-gradient(
+				closest-side,
+				color-mix(in srgb, var(--color-accent) 16%, transparent),
+				transparent
+			)
+			right calc(10% - 80px) center / 840px 840px no-repeat;
 }

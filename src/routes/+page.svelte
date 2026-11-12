@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { SITE_URL } from '$lib/constants';
 	import { jsonLd } from '$lib/utils/jsonld';
-	import Header from '$lib/components/layout/Header.svelte';
+	import LandingHeader from '$lib/components/layout/LandingHeader.svelte';
 	import Footer from '$lib/components/layout/Footer.svelte';
 	import Hero from '$lib/components/landing/Hero.svelte';
-	import DitherBackdrop from '$lib/components/landing/DitherBackdrop.svelte';
+	import FluidBackdrop from '$lib/components/landing/FluidBackdrop.svelte';
 	import Features from '$lib/components/landing/Features.svelte';
 	import FeaturedProfiles from '$lib/components/landing/FeaturedProfiles.svelte';
 	import CallToAction from '$lib/components/landing/CallToAction.svelte';
@@ -39,11 +39,11 @@
 	{@html jsonLd(websiteSchema)}
 </svelte:head>
 
-<Header />
+<LandingHeader />
 
 <main class="relative min-h-screen w-full overflow-hidden">
-	<!-- Floating dithered field behind the hero, fading out before the features -->
-	<DitherBackdrop />
+	<!-- Drifting colour field behind the hero, fading out before the features -->
+	<FluidBackdrop />
 
 	<Hero totalPortfolios={data.totalPortfolios} />
 	<Features />
