@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { SITE_URL } from '$lib/constants';
 	import { jsonLd } from '$lib/utils/jsonld';
-	import LandingHeader from '$lib/components/layout/LandingHeader.svelte';
+	import Header from '$lib/components/layout/Header.svelte';
 	import Footer from '$lib/components/layout/Footer.svelte';
 	import Hero from '$lib/components/landing/Hero.svelte';
 	import FluidBackdrop from '$lib/components/landing/FluidBackdrop.svelte';
@@ -39,7 +39,7 @@
 	{@html jsonLd(websiteSchema)}
 </svelte:head>
 
-<LandingHeader />
+<Header overlay showSearch={false} />
 
 <main class="relative min-h-screen w-full overflow-hidden">
 	<!-- Drifting colour field behind the hero, fading out before the features -->
