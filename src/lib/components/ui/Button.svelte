@@ -31,19 +31,23 @@
 	const baseClasses =
 		'inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer';
 
+	// Text colours that differ from the page's are marked important: as links these
+	// buttons would otherwise take the global `a { color: inherit }`, which is unlayered
+	// and so beats any utility.
 	const variantClasses = {
 		primary:
-			'bg-btn-primary-bg text-btn-primary-text hover:bg-btn-primary-hover focus-visible:ring-accent',
+			'bg-btn-primary-bg text-btn-primary-text! hover:bg-btn-primary-hover focus-visible:ring-accent',
 		secondary:
 			'bg-btn-secondary-bg text-btn-secondary-text border border-border-default hover:bg-btn-secondary-hover hover:border-border-muted focus-visible:ring-accent',
-		ghost: 'text-text-primary hover:text-text-primary hover:bg-bg-tertiary focus-visible:ring-accent',
-		danger: 'bg-accent-red text-white hover:bg-red-600 focus-visible:ring-accent-red'
+		ghost:
+			'text-text-primary hover:text-text-primary hover:bg-bg-tertiary focus-visible:ring-accent',
+		danger: 'bg-accent-red text-white! hover:bg-red-600 focus-visible:ring-accent-red'
 	};
 
 	// Pill colours; the hover feedback comes from the ripple (`.pill-ripple`), tinted by --ripple
 	const pillVariantClasses: Partial<Record<NonNullable<Props['variant']>, string>> = {
 		primary:
-			'bg-btn-primary-bg text-btn-primary-text border-transparent [--ripple:color-mix(in_srgb,var(--color-btn-primary-text)_20%,transparent)] focus-visible:ring-accent',
+			'bg-btn-primary-bg text-btn-primary-text! border-transparent [--ripple:color-mix(in_srgb,var(--color-btn-primary-text)_20%,transparent)] focus-visible:ring-accent',
 		secondary:
 			'bg-text-primary/6 text-text-primary border-text-primary/15 duration-350 hover:border-text-primary/60 [--ripple:color-mix(in_srgb,var(--color-text-primary)_14%,transparent)] focus-visible:ring-accent'
 	};
@@ -62,7 +66,13 @@
 </script>
 
 {#if href}
-	<a {href} {target} class={classes} class:opacity-50={disabled} rel={target === '_blank' ? 'noopener noreferrer' : undefined}>
+	<a
+		{href}
+		{target}
+		class={classes}
+		class:opacity-50={disabled}
+		rel={target === '_blank' ? 'noopener noreferrer' : undefined}
+	>
 		{#if loading}
 			<svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
 				<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"

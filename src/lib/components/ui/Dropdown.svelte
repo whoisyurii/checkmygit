@@ -99,7 +99,7 @@
 		<button
 			type="button"
 			class={[
-				'flex h-9 w-full cursor-pointer items-center justify-between gap-2 rounded-[var(--btn-radius,var(--radius-md))] border bg-bg-secondary pr-2.5 pl-3 text-sm text-text-primary transition-colors hover:border-border-subtle hover:bg-bg-tertiary focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
+				'flex h-9 w-full cursor-pointer items-center justify-between gap-2 rounded-full border bg-bg-secondary pr-3 pl-3.5 text-sm text-text-primary transition-colors hover:border-border-subtle hover:bg-bg-tertiary focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
 				isOpen ? 'border-border-subtle bg-bg-tertiary' : 'border-border-default'
 			]}
 			aria-haspopup="listbox"
@@ -135,7 +135,7 @@
 			bind:this={menu}
 			role="listbox"
 			tabindex="-1"
-			class="menu absolute right-0 z-50 mt-2 max-h-72 w-max min-w-full overflow-y-auto rounded-lg border border-border-default bg-bg-tertiary p-1 shadow-lg"
+			class="menu absolute right-0 z-50 mt-2 max-h-72 w-max min-w-full overflow-y-auto rounded-xl border border-border-default bg-bg-tertiary p-1 shadow-lg"
 			onkeydown={handleMenuKeydown}
 		>
 			{#each options as option (option.value)}
@@ -146,7 +146,7 @@
 					role="option"
 					aria-selected={selected}
 					class={[
-						'flex w-full cursor-pointer items-center gap-2 rounded-md py-1.5 pr-2 pl-2.5 text-left text-sm outline-none! focus:bg-text-primary/8 focus:text-text-primary',
+						'flex w-full cursor-pointer items-center gap-2 rounded-lg py-1.5 pr-2 pl-2.5 text-left text-sm outline-none! focus:bg-text-primary/8 focus:text-text-primary',
 						selected ? 'font-medium text-text-primary' : 'text-text-secondary'
 					]}
 					onclick={() => selectOption(option)}

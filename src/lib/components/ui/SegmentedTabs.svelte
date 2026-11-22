@@ -22,8 +22,8 @@
 
 	const STYLES = {
 		default: {
-			list: 'gap-1 rounded-lg bg-bg-secondary p-1',
-			tab: 'rounded-md px-4 py-2 text-sm',
+			list: 'gap-1 rounded-full bg-bg-secondary p-1',
+			tab: 'rounded-full px-4 py-2 text-sm',
 			active: 'bg-bg-primary text-text-primary shadow-sm ring-1 ring-border-default/60',
 			idle: 'text-text-secondary hover:bg-bg-tertiary/60 hover:text-text-primary'
 		},

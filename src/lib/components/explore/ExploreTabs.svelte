@@ -19,7 +19,7 @@
 </script>
 
 <nav
-	class="inline-flex gap-1 rounded-lg border border-border-default bg-bg-secondary p-1"
+	class="inline-flex gap-1 rounded-full border border-border-default bg-bg-secondary p-1"
 	aria-label="Explore sections"
 >
 	{#each tabs as tab (tab.href)}
@@ -27,7 +27,7 @@
 		<a
 			href={tab.href}
 			aria-current={active ? 'page' : undefined}
-			class="flex cursor-pointer items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all
+			class="flex cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all
 				{active
 				? 'bg-bg-primary text-accent shadow-sm ring-1 ring-border-default/60'
 				: 'text-text-secondary hover:bg-bg-tertiary/60 hover:text-text-primary'}"
