@@ -23,12 +23,13 @@
 </script>
 
 <div class="flex shrink-0 items-center gap-2">
-	<!-- Hidden in profile preview on mobile to avoid header overflow -->
+	<!-- The profile bar carries the most controls, so there Explore waits for a wide
+	     screen and the buttons stay icon-only until their labels fit -->
 	<Button
 		variant="ghost"
 		size="sm"
 		href="/explore/trending"
-		class="{showControls ? 'hidden! sm:inline-flex!' : ''} {isExplore ? 'text-accent!' : ''}"
+		class="{showControls ? 'hidden! lg:inline-flex!' : ''} {isExplore ? 'text-accent!' : ''}"
 	>
 		<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
 			<circle cx="12" cy="12" r="9" stroke-width="2" />
@@ -52,7 +53,7 @@
 					d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
 				/>
 			</svg>
-			<span class="hidden sm:inline">Export</span>
+			<span class="hidden lg:inline">Export</span>
 		</Button>
 		<Button variant="ghost" size="sm" onclick={onShare}>
 			<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -63,7 +64,7 @@
 					d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
 				/>
 			</svg>
-			<span class="hidden sm:inline">Share</span>
+			<span class="hidden lg:inline">Share</span>
 		</Button>
 		<Button variant="ghost" size="sm" onclick={onQRCode}>
 			<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -74,7 +75,7 @@
 					d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
 				/>
 			</svg>
-			<span class="hidden sm:inline">QR</span>
+			<span class="hidden lg:inline">QR</span>
 		</Button>
 	{/if}
 
@@ -95,7 +96,7 @@
 					class="inline-block h-3 w-7 animate-pulse rounded bg-text-tertiary/30"
 				></span>
 			{/if}
-			<span class="hidden sm:inline">Github</span>
+			<span class={showControls ? 'hidden xl:inline' : 'hidden sm:inline'}>Github</span>
 		</span>
 	</Button>
 </div>

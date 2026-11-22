@@ -50,8 +50,10 @@
 			scrolled ? 'border-border-default bg-bg-tertiary/92 pr-2 pl-4' : 'border-transparent px-0'
 		]}
 	>
-		<!-- Equal-width sides keep the middle on the page's centre line -->
-		<div class="flex flex-1">
+		<!-- Equal-width sides keep the middle on the page's centre line; they never
+		     shrink below their content, so on narrow screens the middle gives way.
+		     The profile bar is the fullest, so it drops the wordmark first. -->
+		<div class={['flex min-w-max flex-1', showControls && 'max-lg:[&_span]:hidden']}>
 			<Logo />
 		</div>
 
@@ -67,7 +69,7 @@
 			</div>
 		{/if}
 
-		<div class="flex flex-1 justify-end">
+		<div class="flex min-w-max flex-1 justify-end">
 			<HeaderActions {showControls} {onExport} {onShare} {onQRCode} />
 		</div>
 	</div>
