@@ -8,6 +8,8 @@
 	import TemplateGitHub from '$lib/components/templates/TemplateGitHub.svelte';
 	import TemplateBento from '$lib/components/templates/TemplateBento.svelte';
 	import TemplateMinimal from '$lib/components/templates/TemplateMinimal.svelte';
+	import TemplateTerminal from '$lib/components/templates/TemplateTerminal.svelte';
+	import TemplateNewspaper from '$lib/components/templates/TemplateNewspaper.svelte';
 	import ProfileSkeletonGitHub from '$lib/components/portfolio/ProfileSkeletonGitHub.svelte';
 	import ExportContainer from '$lib/components/export/ExportContainer.svelte';
 	import QRModal from '$lib/components/ui/QRModal.svelte';
@@ -22,6 +24,15 @@
 	import type { GitHubProfile } from '$lib/types/github';
 
 	let { data } = $props();
+
+	const TEMPLATE_COMPONENTS = {
+		github: TemplateGitHub,
+		bento: TemplateBento,
+		minimal: TemplateMinimal,
+		terminal: TemplateTerminal,
+		newspaper: TemplateNewspaper
+	} satisfies Record<TemplateType, unknown>;
+	const Template = $derived(TEMPLATE_COMPONENTS[generatorState.template]);
 
 	// Track loading state and resolved data
 	let isLoading = $state(true);
@@ -172,9 +183,10 @@
 		goto(newUrl, { replaceState: true, noScroll: true });
 	}
 
-	// @font-face CSS with the font files inlined as data URLs. Cached so
-	// repeat exports don't refetch the font binaries.
-	let fontEmbedCSS: string | null = null;
+	// @font-face CSS with the font files inlined as data URLs. Cached so repeat
+	// exports don't refetch the font binaries, and per template because each one
+	// only embeds the fonts it uses.
+	const fontEmbedCache = new Map<TemplateType, string>();
 
 	// Handle export
 	async function handleExport() {
@@ -195,9 +207,11 @@
 			// fonts don't exist. Without embedding them, text renders in a
 			// fallback font and re-wraps inside boxes frozen at Inter metrics,
 			// breaking chips, labels and the sidebar.
-			if (fontEmbedCSS === null) {
+			let fontEmbedCSS = fontEmbedCache.get(generatorState.template);
+			if (fontEmbedCSS === undefined) {
 				try {
 					fontEmbedCSS = await getFontEmbedCSS(element);
+					fontEmbedCache.set(generatorState.template, fontEmbedCSS);
 				} catch (fontErr) {
 					console.warn('Font embedding failed, exporting with system fonts:', fontErr);
 				}
@@ -301,13 +315,13 @@
 
 <div class:page-enter={showEnterAnimation}>
 	<Header
-	username={data.username}
-	template={generatorState.template}
-	showControls={true}
-	onTemplateChange={handleTemplateChange}
-	onExport={handleExport}
-	onShare={handleShare}
-	onQRCode={handleQRCode}
+		username={data.username}
+		template={generatorState.template}
+		showControls={true}
+		onTemplateChange={handleTemplateChange}
+		onExport={handleExport}
+		onShare={handleShare}
+		onQRCode={handleQRCode}
 	/>
 
 	<main id="portfolio-container" class="min-h-screen bg-bg-primary">
@@ -325,13 +339,7 @@
 				</div>
 			</div>
 		{:else if profile}
-			{#if generatorState.template === 'github'}
-				<TemplateGitHub {profile} {views} />
-			{:else if generatorState.template === 'bento'}
-				<TemplateBento {profile} {views} />
-			{:else if generatorState.template === 'minimal'}
-				<TemplateMinimal {profile} {views} />
-			{/if}
+			<Template {profile} {views} />
 		{/if}
 	</main>
 
@@ -340,15 +348,9 @@
 
 <!-- Export Container (rendered off-screen when exporting) -->
 {#if generatorState.isExportMode && profile}
-	<div class="fixed -left-[9999px] top-0">
+	<div class="fixed top-0 -left-[9999px]">
 		<ExportContainer>
-			{#if generatorState.template === 'github'}
-				<TemplateGitHub {profile} {views} />
-			{:else if generatorState.template === 'bento'}
-				<TemplateBento {profile} {views} />
-			{:else if generatorState.template === 'minimal'}
-				<TemplateMinimal {profile} {views} />
-			{/if}
+			<Template {profile} {views} />
 		</ExportContainer>
 	</div>
 {/if}
