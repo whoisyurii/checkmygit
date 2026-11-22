@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { resolve } from '$app/paths';
 	import { onMount, tick } from 'svelte';
 	import Header from '$lib/components/layout/Header.svelte';
 	import Footer from '$lib/components/layout/Footer.svelte';
@@ -12,6 +11,7 @@
 	import TemplateNewspaper from '$lib/components/templates/TemplateNewspaper.svelte';
 	import ProfileSkeletonGitHub from '$lib/components/portfolio/ProfileSkeletonGitHub.svelte';
 	import ExportContainer from '$lib/components/export/ExportContainer.svelte';
+	import ErrorState from '$lib/components/ui/ErrorState.svelte';
 	import QRModal from '$lib/components/ui/QRModal.svelte';
 	import { generatorState, toastState } from '$lib/stores/generator.svelte';
 	import { navigationState } from '$lib/stores/navigation.svelte';
@@ -329,15 +329,11 @@
 			<!-- Show skeleton while loading -->
 			<ProfileSkeletonGitHub />
 		{:else if loadError}
-			<!-- Error state -->
-			<div class="flex min-h-[60vh] items-center justify-center">
-				<div class="text-center">
-					<div class="mb-4 text-6xl">😕</div>
-					<h2 class="mb-2 text-xl font-semibold text-text-primary">Something went wrong</h2>
-					<p class="mb-4 text-text-secondary">{loadError.message || 'Failed to load profile'}</p>
-					<a href={resolve('/')} class="text-accent hover:underline">← Back to home</a>
-				</div>
-			</div>
+			<ErrorState
+				title="Couldn't load this profile"
+				description={loadError.message || 'Failed to load profile'}
+				retry
+			/>
 		{:else if profile}
 			<Template {profile} {views} />
 		{/if}

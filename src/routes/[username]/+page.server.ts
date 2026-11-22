@@ -1,3 +1,4 @@
+import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { fetchGitHubProfile } from '$lib/server/github';
 import { getProfileViews } from '$lib/server/kv';
@@ -9,14 +10,15 @@ export const load: PageServerLoad = async ({ params, platform, cookies }) => {
 	// Stream the profile data so skeleton can show while loading
 	const profilePromise = fetchGitHubProfile(username).then((result) => {
 		if (!result.success) {
-			// Throw a regular error that will be caught by {:catch} in the template
-			const errorMessage =
-				result.error.type === 'NOT_FOUND'
-					? `User "${username}" not found on GitHub`
-					: result.error.type === 'RATE_LIMIT'
-						? 'GitHub API rate limit exceeded. Please try again later.'
-						: result.error.message || 'Failed to fetch GitHub profile';
-			throw new Error(errorMessage);
+			// An expected error, so its message reaches the page; a plain Error from a
+			// streamed promise arrives there as a bare "Internal Error".
+			if (result.error.type === 'NOT_FOUND') {
+				error(404, `User "${username}" not found on GitHub`);
+			}
+			if (result.error.type === 'RATE_LIMIT') {
+				error(429, 'GitHub API rate limit exceeded. Please try again later.');
+			}
+			error(502, result.error.message || 'Failed to fetch GitHub profile');
 		}
 		return result.data;
 	});
