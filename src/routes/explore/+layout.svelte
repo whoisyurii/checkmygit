@@ -7,12 +7,12 @@
 	let { children } = $props();
 </script>
 
-<Header />
+<Header overlay />
 
 <main class="relative min-h-screen w-full overflow-x-hidden">
 	<FluidBackdrop class="h-[600px]" />
 
-	<div class="relative z-10 mx-auto flex max-w-6xl justify-center px-4 pt-12 sm:px-6 lg:px-8">
+	<div class="relative z-10 mx-auto flex max-w-6xl justify-center px-4 pt-28 sm:px-6 lg:px-8">
 		<ExploreTabs />
 	</div>
 

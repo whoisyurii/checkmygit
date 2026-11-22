@@ -5,7 +5,7 @@
 
 	// Back to the hero field: scroll first, then focus without a second jump
 	function focusHeroInput() {
-		const input = document.getElementById('hero-username');
+		const input = document.getElementById('hero-search');
 		if (!input) return;
 		input.scrollIntoView({ block: 'center' });
 		input.focus({ preventScroll: true });

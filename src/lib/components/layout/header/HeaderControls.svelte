@@ -16,4 +16,4 @@
 	}
 </script>
 
-<Dropdown options={templateOptions} value={template} onchange={handleTemplateChange} />
+<Dropdown options={templateOptions} value={template} onchange={handleTemplateChange} class="w-40" />

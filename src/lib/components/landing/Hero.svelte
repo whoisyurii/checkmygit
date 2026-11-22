@@ -97,16 +97,21 @@
 							/>
 						</svg>
 						<input
-							id="hero-username"
-							type="text"
+							id="hero-search"
+							name="search"
+							type="search"
 							placeholder="github-username"
 							aria-label="GitHub username"
 							bind:value={username}
 							onkeydown={handleKeydown}
-							class="w-full border-none bg-transparent px-2.5 py-1.5 text-[15px] text-text-primary placeholder-text-primary/40 ring-0! outline-none! focus:border-none! focus:ring-0! focus:outline-none! focus-visible:border-none! focus-visible:ring-0! focus-visible:outline-none!"
+							class="w-full border-none bg-transparent px-2.5 py-1.5 text-[15px] text-text-primary placeholder-text-primary/40 ring-0! outline-none! focus:border-none! focus:ring-0! focus:outline-none! focus-visible:border-none! focus-visible:ring-0! focus-visible:outline-none! [&::-webkit-search-cancel-button]:appearance-none"
 							spellcheck="false"
 							autocapitalize="off"
 							autocomplete="off"
+							data-1p-ignore
+							data-lpignore="true"
+							data-bwignore
+							data-form-type="other"
 						/>
 					</div>
 					<Button
