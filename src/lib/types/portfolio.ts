@@ -1,13 +1,15 @@
 // Portfolio App Types
 
-export type TemplateType = 'github' | 'bento' | 'minimal';
-
 // Templates in display order. Single source of truth for ids and user-facing labels.
-export const TEMPLATES: { id: TemplateType; label: string; mobileLabel?: string }[] = [
+export const TEMPLATES = [
 	{ id: 'github', label: 'GitHub Style', mobileLabel: 'GitHub' },
 	{ id: 'bento', label: 'Bento Grid', mobileLabel: 'Bento' },
-	{ id: 'minimal', label: 'Minimal' }
-];
+	{ id: 'minimal', label: 'Minimal' },
+	{ id: 'terminal', label: 'Terminal' },
+	{ id: 'newspaper', label: 'Newspaper', mobileLabel: 'News' }
+] as const satisfies readonly { id: string; label: string; mobileLabel?: string }[];
+
+export type TemplateType = (typeof TEMPLATES)[number]['id'];
 
 export type ThemeType = 'dark' | 'light';
 

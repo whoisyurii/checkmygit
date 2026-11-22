@@ -4,6 +4,8 @@
 	interface Item {
 		value: T;
 		label: string;
+		// Shorter label for narrow screens
+		mobileLabel?: string;
 	}
 
 	interface Props {
@@ -36,8 +38,9 @@
 	let styles = $derived(pill ? STYLES.pill : STYLES.default);
 </script>
 
+<!-- Scrolls sideways when the tabs outgrow their container, rather than wrapping or overflowing -->
 <div
-	class="inline-flex border border-border-default {styles.list}"
+	class="inline-flex max-w-full overflow-x-auto border border-border-default {styles.list}"
 	role="tablist"
 	aria-label={ariaLabel}
 >
@@ -48,12 +51,17 @@
 			role="tab"
 			aria-selected={active}
 			onclick={() => onchange(item.value)}
-			class="flex cursor-pointer items-center gap-2 font-medium transition-all {styles.tab} {active
+			class="flex shrink-0 cursor-pointer items-center gap-2 font-medium whitespace-nowrap transition-all {styles.tab} {active
 				? styles.active
 				: styles.idle}"
 		>
 			{#if icon}{@render icon({ item, active })}{/if}
-			{item.label}
+			{#if item.mobileLabel}
+				<span class="sm:hidden">{item.mobileLabel}</span>
+				<span class="hidden sm:inline">{item.label}</span>
+			{:else}
+				{item.label}
+			{/if}
 		</button>
 	{/each}
 </div>

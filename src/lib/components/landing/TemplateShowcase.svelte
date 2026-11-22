@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { prefersReducedMotion } from 'svelte/motion';
+	import { SvelteSet } from 'svelte/reactivity';
 	import SegmentedTabs from '$lib/components/ui/SegmentedTabs.svelte';
 	import { themeState } from '$lib/stores/theme.svelte';
 	import { inView } from '$lib/utils/in-view';
@@ -9,10 +10,21 @@
 	// How long each template stays on screen before the gallery advances
 	const ROTATE_MS = 4000;
 
+	const following = (id: TemplateType) =>
+		TEMPLATES[(TEMPLATES.findIndex((t) => t.id === id) + 1) % TEMPLATES.length].id;
+
 	let active = $state<TemplateType>(TEMPLATES[0].id);
+	// A capture is fetched once its slide is current or next in line, so a first
+	// visit downloads two of them rather than all
+	const loaded = new SvelteSet<TemplateType>([TEMPLATES[0].id, following(TEMPLATES[0].id)]);
 	let paused = $state(false);
-	// No point cross-fading three large images while the gallery is scrolled away
+	// No point cross-fading large images while the gallery is scrolled away
 	let onScreen = $state(true);
+
+	function show(id: TemplateType) {
+		active = id;
+		loaded.add(id).add(following(id));
+	}
 
 	const pause = () => (paused = true);
 	const resume = () => (paused = false);
@@ -21,9 +33,8 @@
 	// so the timer restarts whether the slide advanced on its own or via the tabs.
 	$effect(() => {
 		if (paused || !onScreen || prefersReducedMotion.current) return;
-		const index = TEMPLATES.findIndex((t) => t.id === active);
-		const next = TEMPLATES[(index + 1) % TEMPLATES.length].id;
-		const id = setTimeout(() => (active = next), ROTATE_MS);
+		const next = following(active);
+		const id = setTimeout(() => show(next), ROTATE_MS);
 		return () => clearTimeout(id);
 	});
 </script>
@@ -49,7 +60,9 @@
 	>
 		{#each TEMPLATES as template, i (template.id)}
 			<img
-				src={TEMPLATE_SCREENSHOTS[template.id][themeState.current]}
+				src={loaded.has(template.id)
+					? TEMPLATE_SCREENSHOTS[template.id][themeState.current]
+					: undefined}
 				alt="{template.label} template preview"
 				fetchpriority={i === 0 ? 'high' : 'low'}
 				decoding="async"
@@ -66,9 +79,9 @@
 	<div class="relative mt-6 flex justify-center">
 		<SegmentedTabs
 			pill
-			items={TEMPLATES.map(({ id, label }) => ({ value: id, label }))}
+			items={TEMPLATES.map(({ id, ...rest }) => ({ value: id, ...rest }))}
 			value={active}
-			onchange={(id) => (active = id)}
+			onchange={show}
 			ariaLabel="Portfolio template"
 		/>
 	</div>
