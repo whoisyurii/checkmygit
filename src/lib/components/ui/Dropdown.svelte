@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Snippet } from 'svelte';
+	import { tick, type Snippet } from 'svelte';
 
 	interface Option {
 		value: string;
@@ -29,29 +29,68 @@
 	}: Props = $props();
 
 	let isOpen = $state(false);
+	let root: HTMLDivElement | undefined = $state();
+	let menu: HTMLDivElement | undefined = $state();
+
+	const selectedOption = $derived(options.find((o) => o.value === value));
+
+	function items() {
+		return [...(menu?.querySelectorAll<HTMLElement>('[role="option"]') ?? [])];
+	}
+
+	async function toggle() {
+		if (isOpen) return close();
+		isOpen = true;
+		await tick();
+		// Start on the current option so the arrow keys move from it
+		const all = items();
+		(all.find((el) => el.ariaSelected === 'true') ?? all[0])?.focus();
+	}
+
+	function close() {
+		if (!isOpen) return;
+		// Hand focus back to the trigger when it was inside the menu
+		const hadFocus = menu?.contains(document.activeElement);
+		isOpen = false;
+		if (hadFocus) root?.querySelector('button')?.focus();
+	}
 
 	function selectOption(option: Option) {
 		value = option.value;
-		isOpen = false;
+		close();
 		onchange?.(option.value);
 	}
 
-	function handleKeydown(e: KeyboardEvent, option: Option) {
-		if (e.key === 'Enter' || e.key === ' ') {
+	function handleMenuKeydown(e: KeyboardEvent) {
+		const all = items();
+		const current = all.indexOf(document.activeElement as HTMLElement);
+		const next = {
+			ArrowDown: Math.min(current + 1, all.length - 1),
+			ArrowUp: Math.max(current - 1, 0),
+			Home: 0,
+			End: all.length - 1
+		}[e.key];
+
+		if (next !== undefined) {
 			e.preventDefault();
-			selectOption(option);
+			all[next]?.focus();
+		} else if (e.key === 'Escape' || e.key === 'Tab') {
+			e.preventDefault();
+			close();
 		}
 	}
-
-	const selectedOption = $derived(options.find((o) => o.value === value));
 </script>
 
-<div class="relative {className}">
+<svelte:window onpointerdown={(e) => !root?.contains(e.target as Node) && close()} />
+
+<div class="relative {className}" bind:this={root}>
 	{#if trigger}
 		<button
 			type="button"
 			class="w-full"
-			onclick={() => !disabled && (isOpen = !isOpen)}
+			aria-haspopup="listbox"
+			aria-expanded={isOpen}
+			onclick={toggle}
 			{disabled}
 		>
 			{@render trigger()}
@@ -59,18 +98,16 @@
 	{:else}
 		<button
 			type="button"
-			class="
-				flex h-9 w-full items-center justify-between rounded-md
-				border border-border-default bg-bg-secondary
-				px-3 text-sm text-text-primary transition-colors
-				hover:bg-bg-tertiary
-				focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent
-				disabled:cursor-not-allowed disabled:opacity-50
-			"
-			onclick={() => !disabled && (isOpen = !isOpen)}
+			class={[
+				'flex h-9 w-full cursor-pointer items-center justify-between gap-2 rounded-[var(--btn-radius,var(--radius-md))] border bg-bg-secondary pr-2.5 pl-3 text-sm text-text-primary transition-colors hover:border-border-subtle hover:bg-bg-tertiary focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
+				isOpen ? 'border-border-subtle bg-bg-tertiary' : 'border-border-default'
+			]}
+			aria-haspopup="listbox"
+			aria-expanded={isOpen}
+			onclick={toggle}
 			{disabled}
 		>
-			<span class={!selectedOption ? 'text-text-placeholder' : ''}>
+			<span class={['truncate', !selectedOption && 'text-text-placeholder']}>
 				{#if selectedOption}
 					<span class="sm:hidden">{selectedOption.mobileLabel || selectedOption.label}</span>
 					<span class="hidden sm:inline">{selectedOption.label}</span>
@@ -79,12 +116,14 @@
 				{/if}
 			</span>
 			<svg
-				class="h-4 w-4 text-text-tertiary transition-transform {isOpen
-					? 'rotate-180'
-					: ''}"
+				class={[
+					'h-4 w-4 shrink-0 text-text-tertiary transition-transform duration-200',
+					isOpen && 'rotate-180'
+				]}
 				fill="none"
 				viewBox="0 0 24 24"
 				stroke="currentColor"
+				aria-hidden="true"
 			>
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
 			</svg>
@@ -92,48 +131,67 @@
 	{/if}
 
 	{#if isOpen}
-		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div
-			class="fixed inset-0 z-40"
-			onclick={() => (isOpen = false)}
-			onkeydown={(e) => e.key === 'Escape' && (isOpen = false)}
-		></div>
-		<div
-			class="
-				absolute right-0 z-50 mt-1 min-w-[180px] overflow-hidden rounded-md
-				border border-border-default bg-bg-secondary shadow-lg
-			"
+			bind:this={menu}
+			role="listbox"
+			tabindex="-1"
+			class="menu absolute right-0 z-50 mt-2 max-h-72 w-max min-w-full overflow-y-auto rounded-lg border border-border-default bg-bg-tertiary p-1 shadow-lg"
+			onkeydown={handleMenuKeydown}
 		>
 			{#each options as option (option.value)}
-				<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-				<div
+				{@const selected = option.value === value}
+				<!-- Hover moves focus, so the pointer and the arrow keys share one highlight -->
+				<button
+					type="button"
 					role="option"
-					aria-selected={option.value === value}
-					tabindex="0"
-					class="
-						flex cursor-pointer items-center gap-2 px-3 py-2 text-sm
-						text-text-primary transition-colors
-						hover:bg-bg-tertiary
-						{option.value === value ? 'bg-bg-tertiary' : ''}
-					"
+					aria-selected={selected}
+					class={[
+						'flex w-full cursor-pointer items-center gap-2 rounded-md py-1.5 pr-2 pl-2.5 text-left text-sm outline-none! focus:bg-text-primary/8 focus:text-text-primary',
+						selected ? 'font-medium text-text-primary' : 'text-text-secondary'
+					]}
 					onclick={() => selectOption(option)}
-					onkeydown={(e) => handleKeydown(e, option)}
+					onpointermove={(e) => e.currentTarget.focus({ preventScroll: true })}
 				>
 					{#if option.icon}
 						{@render option.icon()}
 					{/if}
 					{option.label}
-					{#if option.value === value}
-						<svg class="ml-auto h-4 w-4 text-accent" fill="currentColor" viewBox="0 0 20 20">
-							<path
-								fill-rule="evenodd"
-								d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-								clip-rule="evenodd"
-							/>
-						</svg>
-					{/if}
-				</div>
+					<svg
+						class={['ml-auto h-4 w-4 shrink-0 text-accent', !selected && 'invisible']}
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						aria-hidden="true"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2.5"
+							d="M5 13l4 4L19 7"
+						/>
+					</svg>
+				</button>
 			{/each}
 		</div>
 	{/if}
 </div>
+
+<style>
+	.menu {
+		transform-origin: top;
+		animation: menu-in 0.14s ease-out;
+	}
+
+	@keyframes menu-in {
+		from {
+			opacity: 0;
+			transform: translateY(-4px) scale(0.98);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.menu {
+			animation: none;
+		}
+	}
+</style>
