@@ -50,21 +50,26 @@
 			scrolled ? 'border-border-default bg-bg-tertiary/92 pr-2 pl-4' : 'border-transparent px-0'
 		]}
 	>
-		<Logo />
+		<!-- Equal-width sides keep the middle on the page's centre line -->
+		<div class="flex flex-1">
+			<Logo />
+		</div>
 
 		{#if showControls}
 			<!-- Template selector hidden on mobile - GitHub style is default -->
-			<div class="hidden flex-1 justify-center sm:flex">
+			<div class="hidden sm:block">
 				<HeaderControls {template} {onTemplateChange} />
 			</div>
 		{:else if showSearch}
 			<!-- Search is desktop-only; mobile users use the on-page search/generate field -->
-			<div class="hidden flex-1 justify-center sm:flex">
+			<div class="hidden w-full max-w-80 min-w-0 sm:block">
 				<HeaderSearch {username} />
 			</div>
 		{/if}
 
-		<HeaderActions {showControls} {onExport} {onShare} {onQRCode} />
+		<div class="flex flex-1 justify-end">
+			<HeaderActions {showControls} {onExport} {onShare} {onQRCode} />
+		</div>
 	</div>
 </header>
 
