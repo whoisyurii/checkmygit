@@ -13,7 +13,7 @@
 </script>
 
 <div class="relative z-10 overflow-hidden">
-	<!-- Dashed grid, faded on every edge, under three teal glows. Built only from a
+	<!-- Dashed grid, faded on every edge, under three accent glows. Built only from a
 	     tiled image and plain two-stop gradients: masks, conic gradients and blur
 	     filters here each cost a visible GPU stall the first time they are drawn. -->
 	<div class="pointer-events-none absolute top-20 left-0 z-0 h-[500px] w-full" aria-hidden="true">

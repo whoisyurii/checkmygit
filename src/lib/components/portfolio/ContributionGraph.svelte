@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { GitHubProfile, ContributionWeek } from '$lib/types/github';
-	import { formatNumber } from '$lib/utils/github-transform';
+	import { formatNumber, getContributionColor, getContributionLevel } from '$lib/utils/github-transform';
 	import { themeState } from '$lib/stores/theme.svelte';
 	import Card from '$lib/components/ui/Card.svelte';
 
@@ -40,28 +40,6 @@
 		});
 
 		return months;
-	}
-
-	// Get contribution color based on theme
-	function getContributionColor(color: string, count: number): string {
-		if (count === 0) {
-			return themeState.isDark ? '#161b22' : '#ebedf0';
-		}
-
-		// In light mode, use the original colors from GitHub API
-		if (themeState.isLight) {
-			return color;
-		}
-
-		// In dark mode, map light colors to dark equivalents
-		const darkColorMap: Record<string, string> = {
-			'#9be9a8': '#0e4429', // Level 1
-			'#40c463': '#006d32', // Level 2
-			'#30a14e': '#26a641', // Level 3
-			'#216e39': '#39d353'  // Level 4
-		};
-
-		return darkColorMap[color.toLowerCase()] || color;
 	}
 
 	const monthLabels = $derived(getMonthLabels(weeks));
@@ -127,7 +105,7 @@
 								{#each week.contributionDays as day}
 									<div
 										class="aspect-square w-full rounded-sm transition-opacity hover:opacity-80"
-										style="background-color: {getContributionColor(day.color, day.contributionCount)}"
+										style="background-color: {getContributionColor(getContributionLevel(day.contributionCount, day.color), themeState.isLight)}"
 										title="{day.contributionCount} contributions on {new Date(day.date).toLocaleDateString()}"
 									></div>
 								{/each}

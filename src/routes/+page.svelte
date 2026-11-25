@@ -4,7 +4,6 @@
 	import Header from '$lib/components/layout/Header.svelte';
 	import Footer from '$lib/components/layout/Footer.svelte';
 	import Hero from '$lib/components/landing/Hero.svelte';
-	import FluidBackdrop from '$lib/components/landing/FluidBackdrop.svelte';
 	import Features from '$lib/components/landing/Features.svelte';
 	import FeaturedProfiles from '$lib/components/landing/FeaturedProfiles.svelte';
 	import CallToAction from '$lib/components/landing/CallToAction.svelte';
@@ -42,8 +41,7 @@
 <Header overlay showSearch={false} />
 
 <main class="relative min-h-screen w-full overflow-hidden">
-	<!-- Drifting colour field behind the hero, fading out before the features -->
-	<FluidBackdrop />
+	<div class="hero-sky pointer-events-none absolute inset-x-0 top-0" aria-hidden="true"></div>
 
 	<Hero totalPortfolios={data.totalPortfolios} />
 	<Features />
@@ -52,3 +50,21 @@
 </main>
 
 <Footer />
+
+<style>
+	.hero-sky {
+		height: clamp(36rem, 64vw, 70rem);
+		background: url('/hero-midnight.webp') center top / cover no-repeat;
+		mask-image: linear-gradient(to bottom, black 65%, transparent);
+	}
+
+	:global(html.light) .hero-sky {
+		background-image: url('/hero-daylight.webp');
+	}
+
+	@media (max-width: 640px) {
+		.hero-sky {
+			background-position: 26% top;
+		}
+	}
+</style>
