@@ -28,13 +28,13 @@
 
 	/* Accent colors */
 	--color-accent-blue: #3291ff; /* Vercel Blue */
-	--color-accent: #2dd4bf; /* Teal */
+	--color-accent: #91b5de; /* Moonlit blue */
 	--color-accent-purple: #8b5cf6; /* Linear Purple */
 	--color-accent-yellow: #f5a623;
 	--color-accent-orange: #f97316;
 	--color-accent-red: #e00;
 	--color-accent-pink: #ec4899;
-	--color-accent-deep: #0b3b35;
+	--color-accent-deep: #263448;
 
 	/* Button colors */
 	--color-btn-primary-bg: #ededed;
@@ -104,9 +104,9 @@
 	--color-btn-secondary-text: #171717;
 	--color-btn-secondary-hover: #e5e5e5;
 
-	/* Adjusted accents for light background (bright teal needs a deeper tone on white) */
-	--color-accent: #0f9e89;
-	--color-accent-deep: #ccfbf1;
+	/* Adjusted accents for light background (blue needs a deeper tone on white) */
+	--color-accent: #426d9c;
+	--color-accent-deep: #dce8f5;
 
 	/* Shadows adjusted for light mode */
 	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -376,8 +376,8 @@ body:has(.page-enter) {
 
 /* Still version of the hero colour field, under the animated canvas */
 .fluid-fallback {
-	--fluid-core: #55706a;
-	--fluid-mid: #0a453d;
+	--fluid-core: #526984;
+	--fluid-mid: #263448;
 	background:
 		linear-gradient(to bottom, transparent, var(--color-bg-primary)),
 		radial-gradient(
@@ -389,8 +389,8 @@ body:has(.page-enter) {
 }
 
 :root.light .fluid-fallback {
-	--fluid-core: #8fb8b2;
-	--fluid-mid: #99e8d9;
+	--fluid-core: #9ab0c9;
+	--fluid-mid: #c7dcf1;
 }
 
 /* Dashed 90px grid with a dot at every crossing, behind the closing call to action.
@@ -410,7 +410,7 @@ body:has(.page-enter) {
 	--grid-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cg fill-opacity='.08'%3E%3Crect x='10' width='70' height='.5'/%3E%3Crect y='10' width='.5' height='70'/%3E%3C/g%3E%3Cg fill-opacity='.035'%3E%3Crect width='1.8' height='1.8'/%3E%3Crect x='88.2' width='1.8' height='1.8'/%3E%3Crect y='88.2' width='1.8' height='1.8'/%3E%3Crect x='88.2' y='88.2' width='1.8' height='1.8'/%3E%3C/g%3E%3C/svg%3E");
 }
 
-/* Three soft teal glows as one element: left, centre and right */
+/* Three soft blue glows as one element: left, centre and right */
 .landing-glows {
 	--glow-mid: color-mix(in srgb, var(--color-accent) 45%, var(--color-accent-deep));
 	background:

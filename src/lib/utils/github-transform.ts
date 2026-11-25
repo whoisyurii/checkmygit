@@ -156,9 +156,18 @@ function getLanguageCategory(language: string): string | null {
 	return null;
 }
 
-// Get contribution level (0-4) for a count
-export function getContributionLevel(count: number): number {
+// GitHub's calendar colours encode activity relative to each profile.
+const githubContributionLevels: Record<string, number> = {
+	'#9be9a8': 1, '#0e4429': 1,
+	'#40c463': 2, '#006d32': 2,
+	'#30a14e': 3, '#26a641': 3,
+	'#216e39': 4, '#39d353': 4
+};
+
+export function getContributionLevel(count: number, githubColor?: string): number {
 	if (count === 0) return 0;
+	const level = githubColor && githubContributionLevels[githubColor.toLowerCase()];
+	if (level) return level;
 	if (count <= 3) return 1;
 	if (count <= 6) return 2;
 	if (count <= 9) return 3;
@@ -166,8 +175,11 @@ export function getContributionLevel(count: number): number {
 }
 
 // Get contribution color based on level
-export function getContributionColor(level: number): string {
-	const colors = ['#161b22', '#0e4429', '#006d32', '#26a641', '#39d353'];
+const darkContributionColors = ['#161b22', '#263448', '#385e89', '#638bb7', '#91b5de'];
+const lightContributionColors = ['#ebedf0', '#d1e2f3', '#9dbbdb', '#658db8', '#385e89'];
+
+export function getContributionColor(level: number, light = false): string {
+	const colors = light ? lightContributionColors : darkContributionColors;
 	return colors[Math.min(level, 4)];
 }
 

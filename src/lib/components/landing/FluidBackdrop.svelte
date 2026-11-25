@@ -11,7 +11,7 @@
 	let { class: className = 'h-[1100px]' }: Props = $props();
 
 	// Slow fluid colour field in raw WebGL: domain-warped gradient noise mapped
-	// through a three-stop ramp (page background, deep teal, cool mist) with a soft
+	// through a three-stop ramp (page background, deep slate blue, cool mist) with a soft
 	// light on the right. Rendered into a small buffer and stretched by CSS; the
 	// field is smooth enough that this needs no blur filter, and the fade into the
 	// page is done in the shader, so the canvas is a plain opaque layer.
@@ -136,17 +136,17 @@ void main() {
 	vec3 col;
 	if (u_dark > 0.5) {
 		vec3 base = u_bg;
-		vec3 deep = vec3(0.04, 0.27, 0.24);
-		vec3 mist = vec3(0.70, 0.78, 0.76);
+		vec3 deep = vec3(0.15, 0.20, 0.28);
+		vec3 mist = vec3(0.65, 0.73, 0.83);
 		col = mix(base, deep, smoothstep(0.45, 0.8, n + swirl * 0.25));
 		col = mix(col, mist, smoothstep(0.6, 0.85, swirl) * 0.26);
 		col = mix(col, base, smoothstep(0.5, 0.8, n * swirl) * 0.35);
-		col += vec3(0.92, 1.0, 0.97) * core * 0.07 + vec3(0.55, 0.9, 0.84) * halo * 0.1;
+		col += vec3(0.92, 0.96, 1.0) * core * 0.07 + vec3(0.57, 0.71, 0.87) * halo * 0.1;
 		col = mix(col * 0.62, col, vig);
 	} else {
 		vec3 base = u_bg;
-		vec3 wash = vec3(0.68, 0.92, 0.87);
-		vec3 tint = vec3(0.56, 0.72, 0.70);
+		vec3 wash = vec3(0.78, 0.86, 0.95);
+		vec3 tint = vec3(0.60, 0.69, 0.79);
 		col = mix(base, wash, smoothstep(0.45, 0.8, n + swirl * 0.25));
 		col = mix(col, tint, smoothstep(0.6, 0.85, swirl) * 0.45);
 		col = mix(col, base, smoothstep(0.5, 0.8, n * swirl) * 0.35);

@@ -49,7 +49,7 @@
 	onfocusout={resume}
 	use:inView={{ onchange: (visible) => (onScreen = visible) }}
 >
-	<!-- Teal glow beneath the window: a plain gradient, no blur filter to composite -->
+	<!-- Accent glow beneath the window: a plain gradient, no blur filter to composite -->
 	<div
 		class="pointer-events-none absolute inset-x-0 -bottom-4 h-56 opacity-60"
 		style="background: radial-gradient(50% 50% at 50% 50%, var(--color-accent-deep) 0%, color-mix(in srgb, var(--color-accent-deep) 35%, transparent) 45%, transparent 100%)"
