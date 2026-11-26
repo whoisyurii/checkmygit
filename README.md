@@ -59,41 +59,6 @@ The template is part of the URL (`checkmygit.com/torvalds?template=terminal`), s
 
 Built with SvelteKit 2, Svelte 5 runes, TypeScript and Tailwind CSS 4.
 
-## Run it locally
-
-You need Node.js 20.19+ or 22.12+ (the range Vite 7 supports).
-
-```bash
-git clone https://github.com/whoisyurii/checkmygit.git
-cd checkmygit
-npm install
-cp .env.example .env   # then set GITHUB_TOKEN, or delete that line
-npm run dev
-```
-
-The app is served at [localhost:5173](http://localhost:5173). No Cloudflare account is needed for local development.
-
-`.env` holds one variable:
-
-| Variable       | Required | Purpose                                                                                                                                |
-| -------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `GITHUB_TOKEN` | No       | A [personal access token](https://github.com/settings/tokens) with the `read:user` scope, used for the GraphQL queries described above |
-
-Do not leave the placeholder value in place: it is sent to GitHub as it is, and every profile then fails with `GitHub API error: Unauthorized`.
-
-Without a token the app still runs: profiles load over REST without the contribution graph or pinned projects, Rankings reports that the token is missing, and the globe shows a bundled sample set. Trending works either way.
-
-| Command           | What it does                                                 |
-| ----------------- | ------------------------------------------------------------ |
-| `npm run build`   | Production build into `.svelte-kit/cloudflare`               |
-| `npm run preview` | Serves the production build locally                          |
-| `npm run check`   | Type-checks with `svelte-check`                              |
-| `npm run lint`    | Runs the Prettier and ESLint checks                          |
-| `npm run format`  | Formats the code with Prettier                               |
-| `npm run deploy`  | Builds, then runs `wrangler pages deploy` (Cloudflare Pages) |
-
-To deploy your own copy, create a KV namespace and put its id in [`wrangler.toml`](wrangler.toml) under the `PROFILE_VIEWS` binding in place of the committed one, and set `GITHUB_TOKEN` as an environment variable on the Pages project.
-
 ## Status and roadmap
 
 The site is live and maintained. Since the first release it has gained light and dark themes, the Terminal and Newspaper templates, QR codes, organizations and the Explore section.
